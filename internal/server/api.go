@@ -19,14 +19,16 @@ type TicTacToeGrid struct {
 func GetGameGrid(w http.ResponseWriter, req *http.Request) {
 	fmt.Println("handling get arena")
 
-	writeGridJson(w)
+	r := writeGridJson()
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(r)
 }
 
 func PlaceMark(w http.ResponseWriter, req *http.Request) {
 	fmt.Println("handling mark placement from player")
 }
 
-func writeGridJson(w http.ResponseWriter) {
+func writeGridJson() TicTacToeGrid {
 
 	grid := TicTacToeGrid{
 		XMarks: []TicTacToeMark{
@@ -46,7 +48,5 @@ func writeGridJson(w http.ResponseWriter) {
 			},
 		},
 	}
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(grid)
+	return grid
 }
