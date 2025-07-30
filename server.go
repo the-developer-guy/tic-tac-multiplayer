@@ -17,12 +17,12 @@ func main() {
 	http.HandleFunc("/place", server.PlaceMark)
 
 	http.HandleFunc("/createlobby", func(w http.ResponseWriter, r *http.Request) {
-		/*param := r.URL.Query()
-		if len(param) == 0 {
-
-		}*/
-		new_lobby := server.CreateLobby(w, r)
+		if !server.CreateLobby(w, r) {
+			return
+		}
+		new_lobby := server.PrepareLobby(r)
 		Lobbys = append(Lobbys, new_lobby)
+
 	})
 
 	http.HandleFunc("/getlobbys", func(w http.ResponseWriter, r *http.Request) {
