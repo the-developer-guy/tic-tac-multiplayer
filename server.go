@@ -20,9 +20,8 @@ func main() {
 	http.HandleFunc("/createlobby", func(w http.ResponseWriter, r *http.Request) {
 		r.ParseForm()
 		params := []string{
-			r.Form.Get("token"),
-			r.Form.Get("cor_x"),
-			r.Form.Get("cor_y"),
+			r.Form.Get("token1"),
+			r.Form.Get("token2"),
 		}
 
 		if !server.ValidatePOST(w, r, params) {
