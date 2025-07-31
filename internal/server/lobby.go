@@ -1,15 +1,14 @@
 package server
 
 import (
-	"encoding/json"
 	"math/rand"
 	"net/http"
 	"time"
 )
 
 type Player struct {
-	Token string //`json: "token" `
-	Mark  string //`json: "mark" `
+	Token string
+	Mark  string
 }
 
 type Lobby struct {
@@ -18,29 +17,27 @@ type Lobby struct {
 	Grid    TicTacToeGrid `json:"gamegrid"`
 }
 
-func CreateLobby(w http.ResponseWriter, req *http.Request) bool {
+func ValidatePOST(w http.ResponseWriter, req *http.Request, params []string) bool {
 	if req.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return false
 	}
 	req.ParseForm()
-	params := []string{
-		req.Form.Get("token1"),
-		req.Form.Get("token2"),
-	}
 
+	for _, param := range params {
+		if len(param) == 0 {
+			return false
+		}
+	}
 	if len(params[0]) == 0 || len(params[1]) == 0 {
 		http.Error(w, "Missing Arguments", http.StatusBadRequest)
 		return false
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode("Success")
-
 	return true
 }
 
-func PrepareLobby(req *http.Request) Lobby {
+func CreateLobby(req *http.Request) Lobby {
 	req.ParseForm()
 	params := []string{
 		req.Form.Get("token1"),
