@@ -8,7 +8,7 @@ import (
 	"github.com/the-developer-guy/tic-tac-multiplayer/internal/server"
 )
 
-var Lobbys []server.Lobby
+var Lobbies []server.Lobby
 
 func main() {
 	//http://localhost:8080/grid
@@ -28,7 +28,7 @@ func main() {
 			return
 		}
 		new_lobby := server.CreateLobby(r)
-		Lobbys = append(Lobbys, new_lobby)
+		Lobbies = append(Lobbies, new_lobby)
 
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(`{"Lobbyid":` + `"` + new_lobby.LobbyID + `"}`)
@@ -61,8 +61,8 @@ func main() {
 		})
 	})
 
-	http.HandleFunc("/getlobbys", func(w http.ResponseWriter, r *http.Request) {
-		jsonData, err := json.Marshal(Lobbys)
+	http.HandleFunc("/getlobbies", func(w http.ResponseWriter, r *http.Request) {
+		jsonData, err := json.Marshal(Lobbies)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return

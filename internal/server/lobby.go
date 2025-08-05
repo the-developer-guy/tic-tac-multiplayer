@@ -50,7 +50,7 @@ func CreateLobby(req *http.Request) Lobby {
 			{Token: params[1], Mark: "O"},
 		},
 		LobbyID: randomID(),
-		Grid:    writeGridJson(),
+		Grid:    GenerateGrid(),
 	}
 	return lobby
 }
