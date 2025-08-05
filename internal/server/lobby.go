@@ -6,9 +6,27 @@ import (
 	"time"
 )
 
+type Mark int
+
+const (
+	MarkX Mark = iota
+	MarkO
+)
+
+func (m Mark) String() string {
+	switch m {
+	case MarkX:
+		return "X"
+	case MarkO:
+		return "O"
+	default:
+		return ""
+	}
+}
+
 type Player struct {
-	Token string
-	Mark  string
+	Token string `json:"token"`
+	Mark  Mark   `json:"mark"`
 }
 
 type Lobby struct {
@@ -37,22 +55,23 @@ func ValidatePOST(w http.ResponseWriter, req *http.Request, params []string) boo
 	return true
 }
 
-func CreateLobby(req *http.Request) Lobby {
-	req.ParseForm()
-	params := []string{
-		req.Form.Get("token1"),
-		req.Form.Get("token2"),
-	}
-
-	lobby := Lobby{
+// Constructor
+func NewLobby(token1, token2 string) Lobby {
+	return Lobby{
 		Players: []Player{
-			{Token: params[0], Mark: "X"},
-			{Token: params[1], Mark: "O"},
+			{Token: token1, Mark: MarkX},
+			{Token: token2, Mark: MarkO},
 		},
 		LobbyID: randomID(),
 		Grid:    GenerateGrid(),
 	}
-	return lobby
+}
+
+func LobbyResponse(req *http.Request) Lobby {
+	req.ParseForm()
+	token1 := req.Form.Get("token1")
+	token2 := req.Form.Get("token2")
+	return NewLobby(token1, token2)
 }
 
 func randomID() string {

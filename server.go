@@ -27,22 +27,25 @@ func main() {
 		if !server.ValidatePOST(w, r, params) {
 			return
 		}
-		new_lobby := server.CreateLobby(r)
+		new_lobby := server.LobbyResponse(r)
 		Lobbies = append(Lobbies, new_lobby)
 
 		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(`{"Lobbyid":` + `"` + new_lobby.LobbyID + `"}`)
+		response := fmt.Sprintf(`{"Lobbyid": "%s"}`, new_lobby.LobbyID)
+		json.NewEncoder(w).Encode(response)
 
 		//localhost:8080/LOBBYID
 		//Returns the grid for the selected Lobby
-		lobbypath := "/" + new_lobby.LobbyID
+		//lobbypath := "/" + new_lobby.LobbyID
+		lobbypath := fmt.Sprintf("/%s", new_lobby.LobbyID)
 		http.HandleFunc(lobbypath, func(w http.ResponseWriter, r *http.Request) {
 			w.Header().Set("Content-Type", "application/json")
 			json.NewEncoder(w).Encode(new_lobby.Grid)
 		})
 
 		//place
-		http.HandleFunc(lobbypath+"/place", func(w http.ResponseWriter, r *http.Request) {
+		placepath := fmt.Sprintf("%s/place", lobbypath)
+		http.HandleFunc(placepath, func(w http.ResponseWriter, r *http.Request) {
 			r.ParseForm()
 			params := []string{
 				r.Form.Get("token"),
@@ -55,7 +58,8 @@ func main() {
 			fmt.Println("Handling Mark Placement")
 		})
 
-		http.HandleFunc(lobbypath+"/getstatus", func(w http.ResponseWriter, r *http.Request) {
+		statuspath := fmt.Sprintf("%s/getstatus", lobbypath)
+		http.HandleFunc(statuspath, func(w http.ResponseWriter, r *http.Request) {
 			fmt.Println("Handling getstatus")
 			//It supposed to return the grid, who's move is the next, and the status which could be either X_won,O_won,Draw or in-game
 		})
