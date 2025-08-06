@@ -4,11 +4,15 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"sync"
 
 	"github.com/the-developer-guy/tic-tac-multiplayer/internal/server"
 )
 
-var Lobbies []server.Lobby
+var (
+	Lobbies     []server.Lobby
+	lobbiesLock sync.Mutex
+)
 
 func main() {
 	http.HandleFunc("/grid", server.GetGameGrid)
@@ -21,8 +25,11 @@ func main() {
 
 func handleCreateLobby(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
-	newLobby := server.LobbyResponse(r)
+	newLobby := server.ReturnLobby(r, len(Lobbies))
+
+	lobbiesLock.Lock()
 	Lobbies = append(Lobbies, newLobby)
+	lobbiesLock.Unlock()
 
 	w.Header().Set("Content-Type", "application/json")
 	response := map[string]string{"Lobbyid": newLobby.LobbyID}
@@ -49,9 +56,21 @@ func handleCreateLobby(w http.ResponseWriter, r *http.Request) {
 
 	joinLobbyPath := fmt.Sprintf("POST %s/join", lobbyPath)
 	http.HandleFunc(joinLobbyPath, func(w http.ResponseWriter, r *http.Request) {
-		if newLobby.Players[1].Token != "" {
+		r.ParseForm()
+		token := r.Form.Get("token")
+		if newLobby.Players[1].Token != "" || len(token) == 0 {
+			http.Error(w, "Lobby is already occupied or wrong token", http.StatusBadRequest)
 			return
 		}
+		newLobby.Players[1].Token = token
+
+		w.Header().Set("Content-Type", "application/json")
+		jsonData, err := json.Marshal(newLobby)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		w.Write(jsonData)
 	})
 
 	statusPath := fmt.Sprintf("%s/getstatus", lobbyPath)
@@ -62,7 +81,10 @@ func handleCreateLobby(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleGetLobbies(w http.ResponseWriter, r *http.Request) {
+	lobbiesLock.Lock()
 	jsonData, err := json.Marshal(Lobbies)
+	lobbiesLock.Unlock()
+
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

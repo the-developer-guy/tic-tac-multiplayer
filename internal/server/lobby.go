@@ -1,9 +1,8 @@
 package server
 
 import (
-	"math/rand"
+	"fmt"
 	"net/http"
-	"time"
 )
 
 type Mark int
@@ -31,37 +30,25 @@ type Player struct {
 
 type Lobby struct {
 	Players []Player      `json:"players"`
-	LobbyID string        `json:"lobbyid"`
-	Grid    TicTacToeGrid `json:"gamegrid"`
+	LobbyID string        `json:"lobbyID"`
+	Grid    TicTacToeGrid `json:"gameGrid"`
 }
 
 // Constructor
-func NewLobby(token1 string) Lobby {
+func NewLobby(token1 string, lenOfLobbies int) Lobby {
 	return Lobby{
 		Players: []Player{
 			{Token: token1, Mark: MarkX},
 			{Token: "", Mark: MarkO},
 		},
-		LobbyID: randomID(),
+		LobbyID: fmt.Sprintf("lobby_%d", lenOfLobbies),
 		Grid:    GenerateGrid(),
 	}
 }
 
-func LobbyResponse(req *http.Request) Lobby {
+func ReturnLobby(req *http.Request, lenOfLobbies int) Lobby {
 	req.ParseForm()
-	token1 := req.Form.Get("token1")
-	return NewLobby(token1)
-}
+	token1 := req.Form.Get("token")
 
-func randomID() string {
-	const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-	seed := rand.NewSource(time.Now().UnixNano())
-	random := rand.New(seed)
-
-	result := make([]byte, 7)
-	for i := range result {
-		result[i] = charset[random.Intn(len(charset))]
-	}
-
-	return string(result)
+	return NewLobby(token1, lenOfLobbies)
 }
