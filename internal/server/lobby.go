@@ -35,32 +35,12 @@ type Lobby struct {
 	Grid    TicTacToeGrid `json:"gamegrid"`
 }
 
-func ValidatePOST(w http.ResponseWriter, req *http.Request, params []string) bool {
-	if req.Method != http.MethodPost {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		return false
-	}
-	req.ParseForm()
-
-	for _, param := range params {
-		if len(param) == 0 {
-			return false
-		}
-	}
-	if len(params[0]) == 0 || len(params[1]) == 0 {
-		http.Error(w, "Missing Arguments", http.StatusBadRequest)
-		return false
-	}
-
-	return true
-}
-
 // Constructor
-func NewLobby(token1, token2 string) Lobby {
+func NewLobby(token1 string) Lobby {
 	return Lobby{
 		Players: []Player{
 			{Token: token1, Mark: MarkX},
-			{Token: token2, Mark: MarkO},
+			{Token: "", Mark: MarkO},
 		},
 		LobbyID: randomID(),
 		Grid:    GenerateGrid(),
@@ -70,8 +50,7 @@ func NewLobby(token1, token2 string) Lobby {
 func LobbyResponse(req *http.Request) Lobby {
 	req.ParseForm()
 	token1 := req.Form.Get("token1")
-	token2 := req.Form.Get("token2")
-	return NewLobby(token1, token2)
+	return NewLobby(token1)
 }
 
 func randomID() string {

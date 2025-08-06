@@ -11,69 +11,62 @@ import (
 var Lobbies []server.Lobby
 
 func main() {
-	//http://localhost:8080/grid
 	http.HandleFunc("/grid", server.GetGameGrid)
-
-	// http://localhost:8080/place
 	http.HandleFunc("/place", server.PlaceMark)
+	http.HandleFunc("/getlobbies", handleGetLobbies)
+	http.HandleFunc("POST /createlobby", handleCreateLobby)
 
-	http.HandleFunc("/createlobby", func(w http.ResponseWriter, r *http.Request) {
-		r.ParseForm()
-		params := []string{
-			r.Form.Get("token1"),
-			r.Form.Get("token2"),
-		}
+	http.ListenAndServe(":8080", nil)
+}
 
-		if !server.ValidatePOST(w, r, params) {
-			return
-		}
-		new_lobby := server.LobbyResponse(r)
-		Lobbies = append(Lobbies, new_lobby)
+func handleCreateLobby(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
+	newLobby := server.LobbyResponse(r)
+	Lobbies = append(Lobbies, newLobby)
 
+	w.Header().Set("Content-Type", "application/json")
+	response := map[string]string{"Lobbyid": newLobby.LobbyID}
+	json.NewEncoder(w).Encode(response)
+
+	lobbyPath := fmt.Sprintf("/%s", newLobby.LobbyID)
+	http.HandleFunc(lobbyPath, func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-		response := fmt.Sprintf(`{"Lobbyid": "%s"}`, new_lobby.LobbyID)
-		json.NewEncoder(w).Encode(response)
-
-		//localhost:8080/LOBBYID
-		//Returns the grid for the selected Lobby
-		//lobbypath := "/" + new_lobby.LobbyID
-		lobbypath := fmt.Sprintf("/%s", new_lobby.LobbyID)
-		http.HandleFunc(lobbypath, func(w http.ResponseWriter, r *http.Request) {
-			w.Header().Set("Content-Type", "application/json")
-			json.NewEncoder(w).Encode(new_lobby.Grid)
-		})
-
-		//place
-		placepath := fmt.Sprintf("%s/place", lobbypath)
-		http.HandleFunc(placepath, func(w http.ResponseWriter, r *http.Request) {
-			r.ParseForm()
-			params := []string{
-				r.Form.Get("token"),
-				r.Form.Get("cor_x"),
-				r.Form.Get("cor_y"),
-			}
-			if !server.ValidatePOST(w, r, params) {
-				return
-			}
-			fmt.Println("Handling Mark Placement")
-		})
-
-		statuspath := fmt.Sprintf("%s/getstatus", lobbypath)
-		http.HandleFunc(statuspath, func(w http.ResponseWriter, r *http.Request) {
-			fmt.Println("Handling getstatus")
-			//It supposed to return the grid, who's move is the next, and the status which could be either X_won,O_won,Draw or in-game
-		})
+		json.NewEncoder(w).Encode(newLobby.Grid)
 	})
 
-	http.HandleFunc("/getlobbies", func(w http.ResponseWriter, r *http.Request) {
-		jsonData, err := json.Marshal(Lobbies)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+	placePath := fmt.Sprintf("POST %s/place", lobbyPath)
+	http.HandleFunc(placePath, func(w http.ResponseWriter, r *http.Request) {
+		r.ParseForm()
+		token := r.Form.Get("token")
+		corX := r.Form.Get("cor_x")
+		corY := r.Form.Get("cor_y")
+		if token == "" || corX == "" || corY == "" {
+			http.Error(w, "Missing Arguments", http.StatusBadRequest)
 			return
 		}
-		w.Header().Set("Content-Type", "application/json")
-		w.Write(jsonData)
-	}) //Only for testing
-	http.ListenAndServe(":8080", nil)
+		fmt.Println("Handling Mark Placement")
+	})
 
+	joinLobbyPath := fmt.Sprintf("POST %s/join", lobbyPath)
+	http.HandleFunc(joinLobbyPath, func(w http.ResponseWriter, r *http.Request) {
+		if newLobby.Players[1].Token != "" {
+			return
+		}
+	})
+
+	statusPath := fmt.Sprintf("%s/getstatus", lobbyPath)
+	http.HandleFunc(statusPath, func(w http.ResponseWriter, r *http.Request) {
+		fmt.Println("Handling getstatus")
+		//It's supposed to return the grid, who's move is the next, and the status which could be either X_won,O_won,Draw or in-game
+	})
+}
+
+func handleGetLobbies(w http.ResponseWriter, r *http.Request) {
+	jsonData, err := json.Marshal(Lobbies)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(jsonData)
 }
