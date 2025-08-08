@@ -35,11 +35,11 @@ type Lobby struct {
 }
 
 // Constructor
-func NewLobby(token1 string, lenOfLobbies int) Lobby {
+func NewLobby(token1 string, token2 string, atoken string, lenOfLobbies int) Lobby {
 	return Lobby{
 		Players: []Player{
 			{Token: token1, Mark: MarkX},
-			{Token: "", Mark: MarkO},
+			{Token: token2, Mark: MarkO},
 		},
 		LobbyID: fmt.Sprintf("lobby_%d", lenOfLobbies),
 		Grid:    GenerateGrid(),
@@ -49,6 +49,8 @@ func NewLobby(token1 string, lenOfLobbies int) Lobby {
 func ReturnLobby(req *http.Request, lenOfLobbies int) Lobby {
 	req.ParseForm()
 	token1 := req.Form.Get("token")
+	token2 := req.Form.Get("token2")
+	admin_token := req.Form.Get("atoken")
 
-	return NewLobby(token1, lenOfLobbies)
+	return NewLobby(token1, token2, admin_token, lenOfLobbies)
 }

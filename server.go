@@ -25,6 +25,10 @@ func main() {
 
 func handleCreateLobby(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
+	if r.Form.Get("atoken") != "admin" {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
 	newLobby := server.ReturnLobby(r, len(Lobbies))
 
 	lobbiesLock.Lock()
@@ -52,25 +56,6 @@ func handleCreateLobby(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		fmt.Println("Handling Mark Placement")
-	})
-
-	joinLobbyPath := fmt.Sprintf("POST %s/join", lobbyPath)
-	http.HandleFunc(joinLobbyPath, func(w http.ResponseWriter, r *http.Request) {
-		r.ParseForm()
-		token := r.Form.Get("token")
-		if newLobby.Players[1].Token != "" || len(token) == 0 {
-			http.Error(w, "Lobby is already occupied or wrong token", http.StatusBadRequest)
-			return
-		}
-		newLobby.Players[1].Token = token
-
-		w.Header().Set("Content-Type", "application/json")
-		jsonData, err := json.Marshal(newLobby)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		w.Write(jsonData)
 	})
 
 	statusPath := fmt.Sprintf("%s/getstatus", lobbyPath)
