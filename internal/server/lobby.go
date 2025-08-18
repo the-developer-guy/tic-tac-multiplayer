@@ -29,9 +29,9 @@ type Player struct {
 }
 
 type Lobby struct {
-	Players []Player      `json:"players"`
-	LobbyID string        `json:"lobbyID"`
-	Grid    TicTacToeGrid `json:"gameGrid"`
+	Players []Player       `json:"players"`
+	LobbyID string         `json:"lobbyID"`
+	Grid    *TicTacToeGrid `json:"gameGrid"`
 }
 
 // Constructor
@@ -42,7 +42,7 @@ func NewLobby(token1 string, token2 string, atoken string, lenOfLobbies int) Lob
 			{Token: token2, Mark: MarkO},
 		},
 		LobbyID: fmt.Sprintf("lobby_%d", lenOfLobbies),
-		Grid:    GenerateGrid(),
+		Grid:    NewTicTacToeGrid(),
 	}
 }
 

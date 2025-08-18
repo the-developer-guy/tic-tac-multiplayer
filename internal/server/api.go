@@ -6,33 +6,78 @@ import (
 	"net/http"
 )
 
-type TicTacToeMark struct {
-	X int `json:"x"`
-	Y int `json:"y"`
-}
-
-type TicTacToeGrid struct {
-	XMarks []TicTacToeMark `json:"x"`
-	OMarks []TicTacToeMark `json:"o"`
-}
-
-func GetGameGrid(w http.ResponseWriter, req *http.Request) {
+func (ttts *TicTacToeServer) GetGameGrid(w http.ResponseWriter, req *http.Request) {
 	fmt.Println("handling get arena")
 
-	r := GenerateGrid()
+	r := ttts.GenerateGrid()
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(r)
 }
 
-func PlaceMark(w http.ResponseWriter, req *http.Request) {
+func (ttts *TicTacToeServer) PlaceMark(w http.ResponseWriter, req *http.Request) {
 	fmt.Println("handling mark placement from player")
 }
 
-func GenerateGrid() TicTacToeGrid {
+func (ttts *TicTacToeServer) GenerateGrid() TicTacToeGrid {
 
 	grid := TicTacToeGrid{
 		XMarks: []TicTacToeMark{},
 		OMarks: []TicTacToeMark{},
 	}
 	return grid
+}
+
+func (ttts *TicTacToeServer) HandleCreateLobby(w http.ResponseWriter, r *http.Request) {
+	r.ParseForm()
+	if r.Form.Get("atoken") != "admin" {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+	newLobby := ReturnLobby(r, len(ttts.Lobbies))
+
+	ttts.lobbiesLock.Lock()
+	ttts.Lobbies = append(ttts.Lobbies, newLobby)
+	ttts.lobbiesLock.Unlock()
+
+	w.Header().Set("Content-Type", "application/json")
+	response := map[string]string{"Lobbyid": newLobby.LobbyID}
+	json.NewEncoder(w).Encode(response)
+
+	lobbyPath := fmt.Sprintf("/%s", newLobby.LobbyID)
+	http.HandleFunc(lobbyPath, func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(newLobby.Grid)
+	})
+
+	placePath := fmt.Sprintf("POST %s/place", lobbyPath)
+	http.HandleFunc(placePath, func(w http.ResponseWriter, r *http.Request) {
+		r.ParseForm()
+		token := r.Form.Get("token")
+		corX := r.Form.Get("cor_x")
+		corY := r.Form.Get("cor_y")
+		if token == "" || corX == "" || corY == "" {
+			http.Error(w, "Missing Arguments", http.StatusBadRequest)
+			return
+		}
+		fmt.Println("Handling Mark Placement")
+	})
+
+	statusPath := fmt.Sprintf("%s/getstatus", lobbyPath)
+	http.HandleFunc(statusPath, func(w http.ResponseWriter, r *http.Request) {
+		fmt.Println("Handling getstatus")
+		//It's supposed to return the grid, who's move is the next, and the status which could be either X_won,O_won,Draw or in-game
+	})
+}
+
+func (ttts *TicTacToeServer) HandleGetLobbies(w http.ResponseWriter, r *http.Request) {
+	ttts.lobbiesLock.Lock()
+	jsonData, err := json.Marshal(ttts.Lobbies)
+	ttts.lobbiesLock.Unlock()
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(jsonData)
 }
