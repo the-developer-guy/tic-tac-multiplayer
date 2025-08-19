@@ -19,7 +19,7 @@ func (m Mark) String() string {
 	case MarkO:
 		return "O"
 	default:
-		return ""
+		return "?"
 	}
 }
 
@@ -29,7 +29,7 @@ type Player struct {
 }
 
 type Lobby struct {
-	Players []Player       `json:"players"`
+	Players *[]Player      `json:"players"`
 	LobbyID string         `json:"lobbyID"`
 	Grid    *TicTacToeGrid `json:"gameGrid"`
 }
@@ -37,7 +37,7 @@ type Lobby struct {
 // Constructor
 func NewLobby(token1 string, token2 string, atoken string, lenOfLobbies int) Lobby {
 	return Lobby{
-		Players: []Player{
+		Players: &[]Player{
 			{Token: token1, Mark: MarkX},
 			{Token: token2, Mark: MarkO},
 		},
@@ -46,7 +46,7 @@ func NewLobby(token1 string, token2 string, atoken string, lenOfLobbies int) Lob
 	}
 }
 
-func ReturnLobby(req *http.Request, lenOfLobbies int) Lobby {
+func CreateLobbyFromRequest(req *http.Request, lenOfLobbies int) Lobby {
 	req.ParseForm()
 	token1 := req.Form.Get("token")
 	token2 := req.Form.Get("token2")

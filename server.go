@@ -12,7 +12,7 @@ func main() {
 
 	http.HandleFunc("/grid", s.GetGameGrid)
 	http.HandleFunc("/place", s.PlaceMark)
-	http.HandleFunc("/getlobbies", s.HandleGetLobbies)
+	http.HandleFunc("/getlobbies", s.GetActiveLobbies)
 	http.HandleFunc("POST /createlobby", s.HandleCreateLobby)
 
 	http.ListenAndServe(":8080", nil)

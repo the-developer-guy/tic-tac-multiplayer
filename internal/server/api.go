@@ -29,14 +29,15 @@ func (ttts *TicTacToeServer) GenerateGrid() TicTacToeGrid {
 
 func (ttts *TicTacToeServer) HandleCreateLobby(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
-	if r.Form.Get("atoken") != "admin" {
+	adminToken := r.Form.Get("atoken")
+	if adminToken != "admin" { //TODO: Must be replaced in the future
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
-	newLobby := ReturnLobby(r, len(ttts.Lobbies))
+	newLobby := CreateLobbyFromRequest(r, len(ttts.Lobbies))
 
 	ttts.lobbiesLock.Lock()
-	ttts.Lobbies = append(ttts.Lobbies, newLobby)
+	ttts.Lobbies[newLobby.LobbyID] = newLobby
 	ttts.lobbiesLock.Unlock()
 
 	w.Header().Set("Content-Type", "application/json")
@@ -44,11 +45,12 @@ func (ttts *TicTacToeServer) HandleCreateLobby(w http.ResponseWriter, r *http.Re
 	json.NewEncoder(w).Encode(response)
 
 	lobbyPath := fmt.Sprintf("/%s", newLobby.LobbyID)
-	http.HandleFunc(lobbyPath, func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(newLobby.Grid)
-	})
 
+	HandlePlaceInLobby(w, r, lobbyPath)     //lobbyID/place
+	HandleGetStatusInLobby(w, r, lobbyPath) //lobbyID/getstatus
+}
+
+func HandlePlaceInLobby(w http.ResponseWriter, r *http.Request, lobbyPath string) {
 	placePath := fmt.Sprintf("POST %s/place", lobbyPath)
 	http.HandleFunc(placePath, func(w http.ResponseWriter, r *http.Request) {
 		r.ParseForm()
@@ -61,7 +63,9 @@ func (ttts *TicTacToeServer) HandleCreateLobby(w http.ResponseWriter, r *http.Re
 		}
 		fmt.Println("Handling Mark Placement")
 	})
+}
 
+func HandleGetStatusInLobby(w http.ResponseWriter, r *http.Request, lobbyPath string) {
 	statusPath := fmt.Sprintf("%s/getstatus", lobbyPath)
 	http.HandleFunc(statusPath, func(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("Handling getstatus")
@@ -69,7 +73,7 @@ func (ttts *TicTacToeServer) HandleCreateLobby(w http.ResponseWriter, r *http.Re
 	})
 }
 
-func (ttts *TicTacToeServer) HandleGetLobbies(w http.ResponseWriter, r *http.Request) {
+func (ttts *TicTacToeServer) GetActiveLobbies(w http.ResponseWriter, r *http.Request) {
 	ttts.lobbiesLock.Lock()
 	jsonData, err := json.Marshal(ttts.Lobbies)
 	ttts.lobbiesLock.Unlock()
