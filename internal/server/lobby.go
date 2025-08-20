@@ -1,8 +1,10 @@
 package server
 
 import (
-	"fmt"
 	"net/http"
+	"strings"
+
+	"github.com/google/uuid"
 )
 
 type Mark int
@@ -35,22 +37,28 @@ type Lobby struct {
 }
 
 // Constructor
-func NewLobby(token1 string, token2 string, atoken string, lenOfLobbies int) Lobby {
+func NewLobby(token1 string, token2 string) Lobby {
 	return Lobby{
 		Players: &[]Player{
 			{Token: token1, Mark: MarkX},
 			{Token: token2, Mark: MarkO},
 		},
-		LobbyID: fmt.Sprintf("lobby_%d", lenOfLobbies),
+		LobbyID: GenerateUUID(),
 		Grid:    NewTicTacToeGrid(),
 	}
 }
 
-func CreateLobbyFromRequest(req *http.Request, lenOfLobbies int) Lobby {
+func CreateLobbyFromRequest(req *http.Request) Lobby {
 	req.ParseForm()
 	token1 := req.Form.Get("token")
 	token2 := req.Form.Get("token2")
-	admin_token := req.Form.Get("atoken")
 
-	return NewLobby(token1, token2, admin_token, lenOfLobbies)
+	return NewLobby(token1, token2)
+}
+
+func GenerateUUID() string {
+	id := uuid.NewString()
+	parts := strings.Split(id, "-")
+
+	return parts[0]
 }

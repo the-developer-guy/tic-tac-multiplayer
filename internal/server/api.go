@@ -34,7 +34,7 @@ func (ttts *TicTacToeServer) HandleCreateLobby(w http.ResponseWriter, r *http.Re
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
-	newLobby := CreateLobbyFromRequest(r, len(ttts.Lobbies))
+	newLobby := CreateLobbyFromRequest(r)
 
 	ttts.lobbiesLock.Lock()
 	ttts.Lobbies[newLobby.LobbyID] = newLobby
@@ -44,33 +44,24 @@ func (ttts *TicTacToeServer) HandleCreateLobby(w http.ResponseWriter, r *http.Re
 	response := map[string]string{"Lobbyid": newLobby.LobbyID}
 	json.NewEncoder(w).Encode(response)
 
-	lobbyPath := fmt.Sprintf("/%s", newLobby.LobbyID)
-
-	HandlePlaceInLobby(w, r, lobbyPath)     //lobbyID/place
-	HandleGetStatusInLobby(w, r, lobbyPath) //lobbyID/getstatus
+	RegisterLobbyHandlers(newLobby.LobbyID)
 }
 
 func HandlePlaceInLobby(w http.ResponseWriter, r *http.Request, lobbyPath string) {
-	placePath := fmt.Sprintf("POST %s/place", lobbyPath)
-	http.HandleFunc(placePath, func(w http.ResponseWriter, r *http.Request) {
-		r.ParseForm()
-		token := r.Form.Get("token")
-		corX := r.Form.Get("cor_x")
-		corY := r.Form.Get("cor_y")
-		if token == "" || corX == "" || corY == "" {
-			http.Error(w, "Missing Arguments", http.StatusBadRequest)
-			return
-		}
-		fmt.Println("Handling Mark Placement")
-	})
+	r.ParseForm()
+	token := r.Form.Get("token")
+	corX := r.Form.Get("cor_x")
+	corY := r.Form.Get("cor_y")
+	if token == "" || corX == "" || corY == "" {
+		http.Error(w, "Missing Arguments", http.StatusBadRequest)
+		return
+	}
+	fmt.Println("Handling Mark Placement")
 }
 
 func HandleGetStatusInLobby(w http.ResponseWriter, r *http.Request, lobbyPath string) {
-	statusPath := fmt.Sprintf("%s/getstatus", lobbyPath)
-	http.HandleFunc(statusPath, func(w http.ResponseWriter, r *http.Request) {
-		fmt.Println("Handling getstatus")
-		//It's supposed to return the grid, who's move is the next, and the status which could be either X_won,O_won,Draw or in-game
-	})
+	fmt.Println("Handling getstatus")
+	//lobbyPath is going to come in handy when it comes to actually handling the request.
 }
 
 func (ttts *TicTacToeServer) GetActiveLobbies(w http.ResponseWriter, r *http.Request) {
@@ -84,4 +75,17 @@ func (ttts *TicTacToeServer) GetActiveLobbies(w http.ResponseWriter, r *http.Req
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(jsonData)
+}
+
+func RegisterLobbyHandlers(lobbyID string) {
+	placePath := fmt.Sprintf("POST /%s/place", lobbyID)
+	statusPath := fmt.Sprintf("/%s/getstatus", lobbyID)
+
+	http.HandleFunc(placePath, func(w http.ResponseWriter, r *http.Request) {
+		HandlePlaceInLobby(w, r, lobbyID)
+	})
+
+	http.HandleFunc(statusPath, func(w http.ResponseWriter, r *http.Request) {
+		HandleGetStatusInLobby(w, r, lobbyID)
+	})
 }
