@@ -36,8 +36,8 @@ type Lobby struct {
 }
 
 // Constructor
-func NewLobby(token1 string, token2 string) Lobby {
-	return Lobby{
+func NewLobby(token1 string, token2 string) *Lobby {
+	return &Lobby{
 		Players: &[]Player{
 			{Token: token1, Mark: MarkX},
 			{Token: token2, Mark: MarkO},
@@ -47,7 +47,7 @@ func NewLobby(token1 string, token2 string) Lobby {
 	}
 }
 
-func CreateLobbyFromRequest(req *http.Request) Lobby {
+func CreateLobbyFromRequest(req *http.Request) *Lobby {
 	req.ParseForm()
 	token1 := req.Form.Get("token")
 	token2 := req.Form.Get("token2")

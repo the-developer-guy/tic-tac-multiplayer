@@ -7,7 +7,7 @@ import (
 )
 
 type TicTacToeServer struct {
-	Lobbies     map[string]Lobby
+	Lobbies     map[string]*Lobby
 	lobbiesLock sync.Mutex
 }
 
@@ -17,7 +17,7 @@ func (ttts *TicTacToeServer) GetLobby(lobbyId string) (*Lobby, error) {
 
 func NewTicTacToeServer() *TicTacToeServer {
 	ttts := TicTacToeServer{
-		Lobbies: make(map[string]Lobby),
+		Lobbies: make(map[string]*Lobby),
 	}
 	return &ttts
 }
