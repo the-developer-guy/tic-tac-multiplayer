@@ -2,7 +2,6 @@ package server
 
 import (
 	"net/http"
-	"strings"
 
 	"github.com/google/uuid"
 )
@@ -43,7 +42,7 @@ func NewLobby(token1 string, token2 string) Lobby {
 			{Token: token1, Mark: MarkX},
 			{Token: token2, Mark: MarkO},
 		},
-		LobbyID: GenerateUUID(),
+		LobbyID: uuid.NewString(),
 		Grid:    NewTicTacToeGrid(),
 	}
 }
@@ -54,11 +53,4 @@ func CreateLobbyFromRequest(req *http.Request) Lobby {
 	token2 := req.Form.Get("token2")
 
 	return NewLobby(token1, token2)
-}
-
-func GenerateUUID() string {
-	id := uuid.NewString()
-	parts := strings.Split(id, "-")
-
-	return parts[0]
 }
