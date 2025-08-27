@@ -1,7 +1,6 @@
 package server
 
 import (
-	"net/http"
 	"sync"
 
 	"github.com/google/uuid"
@@ -46,12 +45,4 @@ func NewLobby(token1 string, token2 string) *Lobby {
 		LobbyID: uuid.NewString(),
 		Grid:    NewTicTacToeGrid(),
 	}
-}
-
-func CreateLobbyFromRequest(req *http.Request) *Lobby {
-	req.ParseForm()
-	token1 := req.Form.Get("token")
-	token2 := req.Form.Get("token2")
-
-	return NewLobby(token1, token2)
 }

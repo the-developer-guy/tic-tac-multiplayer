@@ -126,3 +126,11 @@ func RegisterLobbyHandlers(lobbyID string) {
 		HandleGetStatusInLobby(w, r, lobbyID)
 	})
 }
+
+func CreateLobbyFromRequest(req *http.Request) *Lobby {
+	req.ParseForm()
+	token1 := req.Form.Get("token")
+	token2 := req.Form.Get("token2")
+
+	return NewLobby(token1, token2)
+}
