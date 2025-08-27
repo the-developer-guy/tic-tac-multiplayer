@@ -97,16 +97,15 @@ func HandleGetStatusInLobby(w http.ResponseWriter, r *http.Request, lobbyPath st
 }
 
 func (ttts *TicTacToeServer) GetActiveLobbies(w http.ResponseWriter, r *http.Request) {
-	ttts.lobbiesLock.Lock()
-	jsonData, err := json.Marshal(ttts.Lobbies)
-	ttts.lobbiesLock.Unlock()
+
+	lobbiesJson, err := ttts.Json()
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
-	w.Write(jsonData)
+	w.Write(lobbiesJson)
 }
 
 func CreateLobbyFromRequest(req *http.Request) *Lobby {

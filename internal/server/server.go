@@ -1,6 +1,7 @@
 package server
 
 import (
+	"encoding/json"
 	"errors"
 	"net/http"
 	"sync"
@@ -35,4 +36,12 @@ func (ttts *TicTacToeServer) AddLobby(lobby *Lobby) {
 	// TODO add check if lobby ID exists
 	ttts.Lobbies[lobby.LobbyID] = lobby
 	ttts.lobbiesLock.Unlock()
+}
+
+func (ttts *TicTacToeServer) Json() ([]byte, error) {
+	ttts.lobbiesLock.Lock()
+	payload, err := json.Marshal(ttts.Lobbies)
+	ttts.lobbiesLock.Unlock()
+
+	return payload, err
 }
