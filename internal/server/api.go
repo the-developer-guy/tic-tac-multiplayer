@@ -9,6 +9,17 @@ import (
 func (ttts *TicTacToeServer) GetGameGrid(w http.ResponseWriter, req *http.Request) {
 	fmt.Println("handling get arena")
 
+	lobbyId := req.PathValue("lobbyId")
+	if lobbyId == "" {
+		http.Error(w, "Missing lobby ID", http.StatusBadRequest)
+		return
+	}
+	_, err := ttts.GetLobby(lobbyId)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Nonexistent lobby ID %s", lobbyId), http.StatusBadRequest)
+		return
+	}
+
 	r := ttts.GenerateGrid()
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(r)
@@ -16,10 +27,32 @@ func (ttts *TicTacToeServer) GetGameGrid(w http.ResponseWriter, req *http.Reques
 
 func (ttts *TicTacToeServer) PlaceMark(w http.ResponseWriter, req *http.Request) {
 	fmt.Println("handling mark placement from player")
+
+	lobbyId := req.PathValue("lobbyId")
+	if lobbyId == "" {
+		http.Error(w, "Missing lobby ID", http.StatusBadRequest)
+		return
+	}
+	_, err := ttts.GetLobby(lobbyId)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Nonexistent lobby ID %s", lobbyId), http.StatusBadRequest)
+		return
+	}
 }
 
 func (ttts *TicTacToeServer) GetLobbyStatus(w http.ResponseWriter, req *http.Request) {
 	fmt.Println("getting lobby status")
+
+	lobbyId := req.PathValue("lobbyId")
+	if lobbyId == "" {
+		http.Error(w, "Missing lobby ID", http.StatusBadRequest)
+		return
+	}
+	_, err := ttts.GetLobby(lobbyId)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Nonexistent lobby ID %s", lobbyId), http.StatusBadRequest)
+		return
+	}
 }
 
 func (ttts *TicTacToeServer) GenerateGrid() TicTacToeGrid {

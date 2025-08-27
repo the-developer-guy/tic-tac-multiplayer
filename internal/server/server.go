@@ -1,6 +1,7 @@
 package server
 
 import (
+	"errors"
 	"net/http"
 	"sync"
 )
@@ -8,6 +9,10 @@ import (
 type TicTacToeServer struct {
 	Lobbies     map[string]Lobby
 	lobbiesLock sync.Mutex
+}
+
+func (ttts *TicTacToeServer) GetLobby(lobbyId string) (*Lobby, error) {
+	return nil, errors.New("Not implemented")
 }
 
 func NewTicTacToeServer() *TicTacToeServer {
