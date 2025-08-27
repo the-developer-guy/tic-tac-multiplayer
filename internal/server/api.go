@@ -80,8 +80,6 @@ func (ttts *TicTacToeServer) HandleCreateLobby(w http.ResponseWriter, r *http.Re
 	w.Header().Set("Content-Type", "application/json")
 	response := map[string]string{"Lobbyid": newLobby.LobbyID}
 	json.NewEncoder(w).Encode(response)
-
-	RegisterLobbyHandlers(newLobby.LobbyID)
 }
 
 func HandlePlaceInLobby(w http.ResponseWriter, r *http.Request, lobbyPath string) {
@@ -112,19 +110,6 @@ func (ttts *TicTacToeServer) GetActiveLobbies(w http.ResponseWriter, r *http.Req
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(jsonData)
-}
-
-func RegisterLobbyHandlers(lobbyID string) {
-	placePath := fmt.Sprintf("POST /%s/place", lobbyID)
-	statusPath := fmt.Sprintf("/%s/getstatus", lobbyID)
-
-	http.HandleFunc(placePath, func(w http.ResponseWriter, r *http.Request) {
-		HandlePlaceInLobby(w, r, lobbyID)
-	})
-
-	http.HandleFunc(statusPath, func(w http.ResponseWriter, r *http.Request) {
-		HandleGetStatusInLobby(w, r, lobbyID)
-	})
 }
 
 func CreateLobbyFromRequest(req *http.Request) *Lobby {
