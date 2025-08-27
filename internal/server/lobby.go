@@ -2,6 +2,7 @@ package server
 
 import (
 	"net/http"
+	"sync"
 
 	"github.com/google/uuid"
 )
@@ -33,9 +34,9 @@ type Lobby struct {
 	Players *[]Player      `json:"players"`
 	LobbyID string         `json:"lobbyID"`
 	Grid    *TicTacToeGrid `json:"gameGrid"`
+	lock    sync.Mutex     // TODO add access methods to Lobby
 }
 
-// Constructor
 func NewLobby(token1 string, token2 string) *Lobby {
 	return &Lobby{
 		Players: &[]Player{
