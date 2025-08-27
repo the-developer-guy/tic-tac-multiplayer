@@ -9,11 +9,7 @@ import (
 func main() {
 
 	s := server.NewTicTacToeServer()
-
-	http.HandleFunc("/grid", s.GetGameGrid)
-	http.HandleFunc("/place", s.PlaceMark)
-	http.HandleFunc("/getlobbies", s.GetActiveLobbies)
-	http.HandleFunc("POST /createlobby", s.HandleCreateLobby)
+	s.RegisterHandles()
 
 	http.ListenAndServe(":8080", nil)
 }
