@@ -71,14 +71,11 @@ func (ttts *TicTacToeServer) HandleCreateLobby(w http.ResponseWriter, r *http.Re
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
-	newLobby := CreateLobbyFromRequest(r)
-
-	ttts.lobbiesLock.Lock()
-	ttts.Lobbies[newLobby.LobbyID] = newLobby
-	ttts.lobbiesLock.Unlock()
+	l := CreateLobbyFromRequest(r)
+	ttts.AddLobby(l)
 
 	w.Header().Set("Content-Type", "application/json")
-	response := map[string]string{"Lobbyid": newLobby.LobbyID}
+	response := map[string]string{"Lobbyid": l.LobbyID}
 	json.NewEncoder(w).Encode(response)
 }
 
