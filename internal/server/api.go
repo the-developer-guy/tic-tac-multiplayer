@@ -18,6 +18,10 @@ func (ttts *TicTacToeServer) PlaceMark(w http.ResponseWriter, req *http.Request)
 	fmt.Println("handling mark placement from player")
 }
 
+func (ttts *TicTacToeServer) GetLobbyStatus(w http.ResponseWriter, req *http.Request) {
+	fmt.Println("getting lobby status")
+}
+
 func (ttts *TicTacToeServer) GenerateGrid() TicTacToeGrid {
 
 	grid := TicTacToeGrid{

@@ -18,8 +18,9 @@ func NewTicTacToeServer() *TicTacToeServer {
 }
 
 func (ttts *TicTacToeServer) RegisterHandles() {
-	http.HandleFunc("/grid", ttts.GetGameGrid)
-	http.HandleFunc("/place", ttts.PlaceMark)
-	http.HandleFunc("/getlobbies", ttts.GetActiveLobbies)
-	http.HandleFunc("POST /createlobby", ttts.HandleCreateLobby)
+	http.HandleFunc("/grid/{lobbyId}/", ttts.GetGameGrid)
+	http.HandleFunc("/place/{lobbyId}/", ttts.PlaceMark)
+	http.HandleFunc("/status/{lobbyId}/", ttts.GetLobbyStatus)
+	http.HandleFunc("/getlobbies/", ttts.GetActiveLobbies)
+	http.HandleFunc("POST /createlobby/", ttts.HandleCreateLobby) // TODO automate lobby creation
 }
