@@ -8,11 +8,8 @@ import (
 
 func main() {
 
-	//http://localhost:8080/grid
-	http.HandleFunc("/grid", server.GetGameGrid)
-
-	// http://localhost:8080/place
-	http.HandleFunc("/place", server.PlaceMark)
+	s := server.NewTicTacToeServer()
+	s.RegisterHandles()
 
 	http.ListenAndServe(":8080", nil)
 }
