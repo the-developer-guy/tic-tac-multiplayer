@@ -110,7 +110,7 @@ func (ttts *TicTacToeServer) GetActiveLobbies(w http.ResponseWriter, r *http.Req
 
 func CreateLobbyFromRequest(req *http.Request) *Lobby {
 	req.ParseForm()
-	token1 := req.Form.Get("token")
+	token1 := req.Form.Get("token1")
 	token2 := req.Form.Get("token2")
 
 	return NewLobby(token1, token2)
