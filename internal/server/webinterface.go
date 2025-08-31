@@ -1,6 +1,7 @@
 package server
 
 import (
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"net/http"
@@ -93,8 +94,21 @@ func (ttts *TicTacToeServer) ainterFace(w http.ResponseWriter, req *http.Request
 		return
 	}
 
+	t, _ := template.ParseFiles("./templates/interface.html")
+	t.Execute(w, nil)
+}
+
+func (ttts *TicTacToeServer) GetData(w http.ResponseWriter, req *http.Request) {
+	session, _ := store.Get(req, sessionName)
+	auth, ok := session.Values["authenticated"].(bool)
+	if !auth || !ok {
+		http.Error(w, "Forbidden", http.StatusForbidden)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
 	dataStore := NewFetchedData()
 	allPlayers := dataStore.GetAllData()
-	t, _ := template.ParseFiles("./templates/interface.html")
-	t.Execute(w, allPlayers)
+
+	json.NewEncoder(w).Encode(allPlayers)
 }

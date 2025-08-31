@@ -32,6 +32,7 @@ func (ttts *TicTacToeServer) RegisterHandles() {
 	http.HandleFunc("/login/", ttts.LoginPage)
 	http.HandleFunc("POST /accessc", ttts.accessControl)
 	http.HandleFunc("/ainterface/", ttts.ainterFace)
+	http.HandleFunc("/fetchdata/", ttts.GetData)
 }
 
 func (ttts *TicTacToeServer) AddLobby(lobby *Lobby) {
