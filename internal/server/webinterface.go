@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
-	"time"
 
 	"github.com/gorilla/securecookie"
 	"github.com/gorilla/sessions"
@@ -19,13 +18,6 @@ var (
 	sessionName = "ttt_session"
 	envFile, _  = godotenv.Read(".env")
 )
-
-var playerex = Player{
-	Name:           "Zsoric Migmond",
-	Token:          "vmi123",
-	dateofRegister: time.Now(),
-	isBanned:       false,
-}
 
 func (ttts *TicTacToeServer) LoginPage(w http.ResponseWriter, req *http.Request) {
 	t, err := template.ParseFiles("./templates/login.html")
@@ -101,6 +93,8 @@ func (ttts *TicTacToeServer) ainterFace(w http.ResponseWriter, req *http.Request
 		return
 	}
 
+	dataStore := NewFetchedData()
+	allPlayers := dataStore.GetAllData()
 	t, _ := template.ParseFiles("./templates/interface.html")
-	t.Execute(w, playerex)
+	t.Execute(w, allPlayers)
 }
