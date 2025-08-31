@@ -29,6 +29,9 @@ func (ttts *TicTacToeServer) RegisterHandles() {
 	http.HandleFunc("/status/{lobbyId}/", ttts.GetLobbyStatus)
 	http.HandleFunc("/getlobbies/", ttts.GetActiveLobbies)
 	http.HandleFunc("POST /createlobby/", ttts.HandleCreateLobby) // TODO automate lobby creation
+	http.HandleFunc("/login/", ttts.LoginPage)
+	http.HandleFunc("POST /accessc", ttts.accessControl)
+	http.HandleFunc("/ainterface/", ttts.ainterFace)
 }
 
 func (ttts *TicTacToeServer) AddLobby(lobby *Lobby) {

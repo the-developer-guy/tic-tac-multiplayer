@@ -2,6 +2,7 @@ package server
 
 import (
 	"sync"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -28,19 +29,19 @@ type Player struct {
 	Token          string
 	Name           string
 	isBanned       bool
-	dateofRegister string
+	dateofRegister time.Time
 }
 
 type Lobby struct {
-	Players map[string]string `json:"players"`
-	LobbyID string            `json:"lobbyID"`
-	Grid    *TicTacToeGrid    `json:"gameGrid"`
-	lock    sync.Mutex        // TODO add access methods to Lobby
+	Players *map[string]string `json:"players"`
+	LobbyID string             `json:"lobbyID"`
+	Grid    *TicTacToeGrid     `json:"gameGrid"`
+	lock    sync.Mutex         // TODO add access methods to Lobby
 }
 
 func NewLobby(token1 string, token2 string) *Lobby {
 	return &Lobby{
-		Players: map[string]string{
+		Players: &map[string]string{
 			MarkX.String(): token1,
 			MarkO.String(): token2,
 		},

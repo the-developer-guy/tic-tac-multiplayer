@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+</head>
+    <body>
+        {{if .LoginFailed}}
+            <h1>Wrong username or password.</h1>
+        {{end}}
+        <h2>Login Page</h2>
+        <form action="/accessc" method="POST">
+            <input type="text" name="usr" placeholder="Username">
+            <br>
+            <input type="password" name="pass" placeholder="Password">
+            <br>
+            <input type="submit">
+        </form>
+    </body>
+</html>
