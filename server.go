@@ -9,7 +9,8 @@ import (
 func main() {
 
 	s := server.NewTicTacToeServer()
-	s.RegisterHandles()
+	s.RegisterApiHandles()
+	s.RegisterAdminHandles()
 
 	http.ListenAndServe(":8080", nil)
 }

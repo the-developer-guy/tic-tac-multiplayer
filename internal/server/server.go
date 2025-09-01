@@ -23,11 +23,14 @@ func NewTicTacToeServer() *TicTacToeServer {
 	return &ttts
 }
 
-func (ttts *TicTacToeServer) RegisterHandles() {
+func (ttts *TicTacToeServer) RegisterApiHandles() {
 	http.HandleFunc("/grid/{lobbyId}/", ttts.GetGameGrid)
 	http.HandleFunc("/place/{lobbyId}/", ttts.PlaceMark)
 	http.HandleFunc("/status/{lobbyId}/", ttts.GetLobbyStatus)
 	http.HandleFunc("/getlobbies/", ttts.GetActiveLobbies)
+}
+
+func (ttts *TicTacToeServer) RegisterAdminHandles() {
 	http.HandleFunc("POST /createlobby/", ttts.HandleCreateLobby) // TODO automate lobby creation
 }
 
