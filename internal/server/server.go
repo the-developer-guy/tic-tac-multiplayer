@@ -12,10 +12,6 @@ type TicTacToeServer struct {
 	lobbiesLock sync.Mutex
 }
 
-func (ttts *TicTacToeServer) GetLobby(lobbyId string) (*Lobby, error) {
-	return nil, errors.New("Not implemented")
-}
-
 func NewTicTacToeServer() *TicTacToeServer {
 	ttts := TicTacToeServer{
 		Lobbies: make(map[string]*Lobby),
@@ -24,14 +20,15 @@ func NewTicTacToeServer() *TicTacToeServer {
 }
 
 func (ttts *TicTacToeServer) RegisterApiHandles() {
-	http.HandleFunc("/grid/{lobbyId}/", ttts.GetGameGrid)
-	http.HandleFunc("/place/{lobbyId}/", ttts.PlaceMark)
-	http.HandleFunc("/status/{lobbyId}/", ttts.GetLobbyStatus)
-	http.HandleFunc("/getlobbies/", ttts.GetActiveLobbies)
+	http.HandleFunc("GET /playerinfo/{playerId}", ttts.HandlePlayerInfo)
+	http.HandleFunc("GET /ready/{playerId}/", ttts.HandleReadyPlayer)
+
+	http.HandleFunc("GET /getgrid/{lobbyId}/", ttts.HandleGetGameGrid)
+	http.HandleFunc("POST /place/{lobbyId}/", ttts.HandlePlaceMark)
 }
 
 func (ttts *TicTacToeServer) RegisterAdminHandles() {
-	http.HandleFunc("POST /createlobby/", ttts.HandleCreateLobby) // TODO automate lobby creation
+	http.HandleFunc("GET /admin/players/", ttts.HandleAdminListPlayers)
 }
 
 func (ttts *TicTacToeServer) AddLobby(lobby *Lobby) {
@@ -39,6 +36,10 @@ func (ttts *TicTacToeServer) AddLobby(lobby *Lobby) {
 	// TODO add check if lobby ID exists
 	ttts.Lobbies[lobby.LobbyID] = lobby
 	ttts.lobbiesLock.Unlock()
+}
+
+func (ttts *TicTacToeServer) GetLobby(lobbyId string) (*Lobby, error) {
+	return nil, errors.New("Not implemented")
 }
 
 func (ttts *TicTacToeServer) Json() ([]byte, error) {
