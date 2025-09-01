@@ -20,7 +20,7 @@ func NewTicTacToeServer() *TicTacToeServer {
 }
 
 func (ttts *TicTacToeServer) RegisterApiHandles() {
-	http.HandleFunc("GET /playerinfo/{playerId}", ttts.HandlePlayerInfo)
+	http.HandleFunc("GET /playerinfo/{playerId}/", ttts.HandlePlayerInfo)
 	http.HandleFunc("GET /ready/{playerId}/", ttts.HandleReadyPlayer)
 
 	http.HandleFunc("GET /getgrid/{lobbyId}/", ttts.HandleGetGameGrid)
