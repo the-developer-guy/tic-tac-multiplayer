@@ -18,6 +18,9 @@ var (
 
 	sessionName = "ttt_session"
 	envFile, _  = godotenv.Read(".env")
+
+	dataStore = NewFetchedData() //Temporary, it has to be changed as soon DB is implemented.
+
 )
 
 func (ttts *TicTacToeServer) LoginPage(w http.ResponseWriter, req *http.Request) {
@@ -107,9 +110,26 @@ func (ttts *TicTacToeServer) GetData(w http.ResponseWriter, req *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	dataStore := NewFetchedData()
 	allPlayers := dataStore.GetAllData()
 	fmt.Println(allPlayers)
 
 	json.NewEncoder(w).Encode(allPlayers)
+}
+
+func (ttts *TicTacToeServer) NewPlayer(w http.ResponseWriter, req *http.Request) {
+	session, _ := store.Get(req, sessionName)
+	auth, ok := session.Values["authenticated"].(bool)
+	if !auth || !ok {
+		http.Error(w, "Forbidden", http.StatusForbidden)
+		return
+	}
+	req.ParseForm()
+	name := req.Form.Get("name")
+	if name == "" {
+		http.Error(w, "Missing playerName paramater", http.StatusBadRequest)
+		return
+	}
+
+	dataStore.NewPlayer(name)
+	http.Redirect(w, req, "/ainterface/", http.StatusSeeOther)
 }
