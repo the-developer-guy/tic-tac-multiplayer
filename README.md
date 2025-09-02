@@ -12,6 +12,24 @@ Each player gets an `ID` and some form of authentication (token for example) fro
 
 When a lobby's status changes to `finished`, all players must call `Ready` to indicate they are ready again.
 
+### Player states
+
+The basic logic behind a client's state.
+
+```mermaid
+flowchart TD
+    A(Idle) -->|Ready called| B(Active)
+    B -->|Timeout| A
+    B -->|Server finds a match| C(Scheduled)
+    C -->|Lobby opens| D[In-game]
+    D -->|Game finished| A
+```
+
+- Idle: the player/client is evaulating the results, or just plain offline. It can enter the player queue by calling `Ready`.
+- Active: the client application is up and running, ready to play. It got a valid response from the server, but no match is organized. Should call `Ready` periodically to check if a match is ready.
+- Scheduled: the server has a game lobby ready for both players. Match starts at a predefined time. Clients should only call `Get grid` periodically to get the state of the lobby.
+- In-game: the lobby is open, the game is on! Call the `Get grid` to get the state (mark positions, if it's your turn). If it's your turn, a single `Place` call places the player's mark. Call `Get grid` to get the result. If the game finished, both players go back to the `Idle` state.
+
 ## API
 
 ### Get player information
