@@ -2,7 +2,6 @@ package server
 
 import (
 	"fmt"
-	"time"
 )
 
 type FetchedData struct {
@@ -13,9 +12,9 @@ type FetchedData struct {
 func NewFetchedData() *FetchedData {
 	return &FetchedData{
 		data: map[int]Player{
-			1: {Name: "Lakatos Tivadar", Token: "123", isBanned: false, dateofRegister: time.Now()},
-			2: {Name: "Zsoric Migmond", Token: "123asd", isBanned: false, dateofRegister: time.Now()},
-			3: {Name: "Lakatos Tivadar", Token: "asd123", isBanned: false, dateofRegister: time.Now()},
+			1: {Name: "Lakatos Tivadar", Token: "123", IsBanned: false, DateOfRegister: "1/1/26"},
+			2: {Name: "Zsoric Migmond", Token: "123asd", IsBanned: false, DateOfRegister: "1/1/26"},
+			3: {Name: "Lakatos Tivadar", Token: "asd123", IsBanned: false, DateOfRegister: "1/1/26"},
 		},
 	}
 }

@@ -5,10 +5,62 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <script>
-        console.log("sziaa");
+        function sendRequest(method,endpoint, data) {
+            const xhttp = new XMLHttpRequest;
+            xhttp.onload = function() {
+              const data = JSON.parse(this.responseText)
+              console.log(data["1"]);
+              console.log(data);
+              fillElements(data);
+             }
+             xhttp.open("GET", "/fetchdata/", true) 
+             xhttp.send();
+        }
+        function fillElements(data) {
+
+            for (const key in data) {
+                const player = data[key];
+                const x = document.createElement("div");
+                x.classList.add("data", "dynamic");
+
+                let h4Name = document.createElement("h4");
+                h4Name.innerHTML = `Name: ${player.name}`;
+                x.appendChild(h4Name);
+
+                let h4Token = document.createElement("h4");
+                h4Token.innerHTML = `Token: ${player.token}`;
+                x.appendChild(h4Token);
+
+                let h4Register = document.createElement("h4");
+                h4Register.innerHTML = `Date of Register: ${player.dateOfRegister}`;
+                x.appendChild(h4Register);
+
+                let h4Banned = document.createElement("h4");
+                h4Banned.innerHTML = `Banned: ${player.isBanned}`;
+                x.appendChild(h4Banned);
+
+                document.body.appendChild(x);
+                }
+            }
+        
+        sendRequest();
     </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+        .data {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            background-color: gray;
+            color: white;
+            flex-direction: row;
+        }
+    </style>
 </head>
 <body>
-
+    
 </body>
 </html>

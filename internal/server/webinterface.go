@@ -109,6 +109,7 @@ func (ttts *TicTacToeServer) GetData(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	dataStore := NewFetchedData()
 	allPlayers := dataStore.GetAllData()
+	fmt.Println(allPlayers)
 
 	json.NewEncoder(w).Encode(allPlayers)
 }

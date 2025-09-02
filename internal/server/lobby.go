@@ -2,7 +2,6 @@ package server
 
 import (
 	"sync"
-	"time"
 
 	"github.com/google/uuid"
 )
@@ -26,10 +25,10 @@ func (m Mark) String() string {
 }
 
 type Player struct {
-	Token          string
-	Name           string
-	isBanned       bool
-	dateofRegister time.Time
+	Name           string `json:"name"`
+	Token          string `json:"token"`
+	IsBanned       bool   `json:"isBanned"`
+	DateOfRegister string `json:"dateOfRegister"`
 }
 
 type Lobby struct {
