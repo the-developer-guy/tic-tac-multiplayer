@@ -150,3 +150,17 @@ func (ttts *TicTacToeServer) RegenerateToken(w http.ResponseWriter, req *http.Re
 
 	dataStore.RegenerateToken(token)
 }
+
+func (ttts *TicTacToeServer) BanOrEnablePlayer(w http.ResponseWriter, req *http.Request) {
+	if err := CheckSession(w, req); err != nil {
+		return
+	}
+
+	req.ParseForm()
+	token := req.Form.Get("token")
+	if token == "" {
+		http.Error(w, "Missing Token parameter", http.StatusBadRequest)
+		return
+	}
+	dataStore.HandlePlayerAccess(token)
+}

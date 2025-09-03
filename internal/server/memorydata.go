@@ -69,3 +69,14 @@ func (f *FetchedData) RegenerateToken(token string) error {
 
 	return nil
 }
+
+func (f *FetchedData) HandlePlayerAccess(token string) error {
+	id, err := f.GetDataByToken(token)
+	if err != nil {
+		return fmt.Errorf("Error interacting with Player")
+	}
+	player := f.data[id]
+	player.IsBanned = !player.IsBanned
+	f.data[id] = player
+	return nil
+}

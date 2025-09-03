@@ -29,14 +29,18 @@ func (ttts *TicTacToeServer) RegisterHandles() {
 	http.HandleFunc("/status/{lobbyId}/", ttts.GetLobbyStatus)
 	http.HandleFunc("/getlobbies/", ttts.GetActiveLobbies)
 	http.HandleFunc("POST /createlobby/", ttts.HandleCreateLobby) // TODO automate lobby creation
+	ttts.RegisterInterfaceHandlers()
+}
+
+func (ttts *TicTacToeServer) RegisterInterfaceHandlers() {
 	http.HandleFunc("/login/", ttts.LoginPage)
 	http.HandleFunc("POST /accessc", ttts.accessControl)
 	http.HandleFunc("/ainterface/", ttts.ainterFace)
 	http.HandleFunc("/fetchdata/", ttts.GetData)
 	http.HandleFunc("/manualnewplayer/", ttts.NewPlayer)
 	http.HandleFunc("/regeneratetoken/", ttts.RegenerateToken)
+	http.HandleFunc("/handleplayeraccess/", ttts.BanOrEnablePlayer)
 }
-
 func (ttts *TicTacToeServer) AddLobby(lobby *Lobby) {
 	ttts.lobbiesLock.Lock()
 	// TODO add check if lobby ID exists

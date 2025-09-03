@@ -33,7 +33,11 @@
                 const banBtn = clone.querySelector("#ban-btn");
                 banBtn.textContent = player.isBanned ? "Enable" : "Ban";
                 banBtn.addEventListener("click", function() {
-                    alert(`Ban/Enable clicked for token: ${player.token}`);
+                    var xhr = new XMLHttpRequest();
+                    xhr.open('POST', '/handleplayeraccess/', true);
+                    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+                    xhr.send(`token=${player.token}`);
+                    location.reload() 
                 });
 
                 const regenBtn = clone.querySelector(".regen-btn");
@@ -42,7 +46,7 @@
                     xhr.open('POST', '/regeneratetoken/', true);
                     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
                     xhr.send(`token=${player.token}`);
-                    location.reload()
+                    location.reload() 
                 });
 
                 const removeBtn = clone.querySelector(".remove-btn:not(#ban-btn)");
