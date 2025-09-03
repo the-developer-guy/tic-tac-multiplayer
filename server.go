@@ -10,6 +10,7 @@ func main() {
 
 	s := server.NewTicTacToeServer()
 	s.RegisterHandles()
+	s.RegisterInterfaceHandlers()
 
 	http.ListenAndServe(":8080", nil)
 }

@@ -95,7 +95,7 @@ func (ttts *TicTacToeServer) accessControl(w http.ResponseWriter, req *http.Requ
 
 	session.AddFlash("invalid_credentials", "login")
 	_ = session.Save(req, w)
-	//fmt.Println(session.Flashes())
+
 	http.Redirect(w, req, "/login/", http.StatusSeeOther)
 }
 
@@ -115,7 +115,6 @@ func (ttts *TicTacToeServer) GetData(w http.ResponseWriter, req *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	allPlayers := dataStore.GetAllData()
-	fmt.Println(allPlayers)
 
 	json.NewEncoder(w).Encode(allPlayers)
 }
@@ -149,6 +148,7 @@ func (ttts *TicTacToeServer) RegenerateToken(w http.ResponseWriter, req *http.Re
 	}
 
 	dataStore.RegenerateToken(token)
+	w.WriteHeader(http.StatusOK)
 }
 
 func (ttts *TicTacToeServer) BanOrEnablePlayer(w http.ResponseWriter, req *http.Request) {
@@ -163,4 +163,21 @@ func (ttts *TicTacToeServer) BanOrEnablePlayer(w http.ResponseWriter, req *http.
 		return
 	}
 	dataStore.HandlePlayerAccess(token)
+	w.WriteHeader(http.StatusOK)
+
+}
+
+func (ttts *TicTacToeServer) RemoveUser(w http.ResponseWriter, req *http.Request) {
+	if err := CheckSession(w, req); err != nil {
+		return
+	}
+
+	req.ParseForm()
+	token := req.Form.Get("token")
+	if token == "" {
+		http.Error(w, "Missing Token parameter", http.StatusBadRequest)
+		return
+	}
+	dataStore.RemovePlayer(token)
+	w.WriteHeader(http.StatusOK)
 }

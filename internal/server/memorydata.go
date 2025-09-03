@@ -80,3 +80,14 @@ func (f *FetchedData) HandlePlayerAccess(token string) error {
 	f.data[id] = player
 	return nil
 }
+
+func (f *FetchedData) RemovePlayer(token string) error {
+	id, err := f.GetDataByToken(token)
+	if err != nil {
+		fmt.Println("RemovePlayer: token not found:", token)
+		return fmt.Errorf("Error interacting with Player")
+	}
+	delete(f.data, id)
+	fmt.Println("RemovePlayer: deleted id", id)
+	return nil
+}

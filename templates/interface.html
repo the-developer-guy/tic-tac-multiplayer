@@ -51,7 +51,11 @@
 
                 const removeBtn = clone.querySelector(".remove-btn:not(#ban-btn)");
                 removeBtn.addEventListener("click", function() {
-                    alert(`Remove clicked for token: ${player.token}`);
+                    var xhr = new XMLHttpRequest();
+                    xhr.open('POST', '/removeplayer/', true);
+                    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+                    xhr.send(`token=${player.token}`);
+                    location.reload() 
                 });
 
                 placeholder.appendChild(clone);
