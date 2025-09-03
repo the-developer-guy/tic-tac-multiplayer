@@ -51,6 +51,16 @@ func (ttts *TicTacToeServer) LoginPage(w http.ResponseWriter, req *http.Request)
 	}
 }
 
+func CheckSession(w http.ResponseWriter, req *http.Request) error {
+	session, _ := store.Get(req, sessionName)
+	auth, ok := session.Values["authenticated"].(bool)
+	if !auth || !ok {
+		http.Error(w, "Forbidden", http.StatusForbidden)
+		return fmt.Errorf("Forbidden")
+	}
+	return nil
+}
+
 func (ttts *TicTacToeServer) accessControl(w http.ResponseWriter, req *http.Request) {
 	if err := req.ParseForm(); err != nil {
 		http.Error(w, "Bad Request", http.StatusBadRequest)
@@ -90,10 +100,7 @@ func (ttts *TicTacToeServer) accessControl(w http.ResponseWriter, req *http.Requ
 }
 
 func (ttts *TicTacToeServer) ainterFace(w http.ResponseWriter, req *http.Request) {
-	session, _ := store.Get(req, sessionName)
-	auth, ok := session.Values["authenticated"].(bool)
-	if !auth || !ok {
-		http.Error(w, "Forbidden", http.StatusForbidden)
+	if err := CheckSession(w, req); err != nil {
 		return
 	}
 
@@ -102,10 +109,7 @@ func (ttts *TicTacToeServer) ainterFace(w http.ResponseWriter, req *http.Request
 }
 
 func (ttts *TicTacToeServer) GetData(w http.ResponseWriter, req *http.Request) {
-	session, _ := store.Get(req, sessionName)
-	auth, ok := session.Values["authenticated"].(bool)
-	if !auth || !ok {
-		http.Error(w, "Forbidden", http.StatusForbidden)
+	if err := CheckSession(w, req); err != nil {
 		return
 	}
 
@@ -117,16 +121,14 @@ func (ttts *TicTacToeServer) GetData(w http.ResponseWriter, req *http.Request) {
 }
 
 func (ttts *TicTacToeServer) NewPlayer(w http.ResponseWriter, req *http.Request) {
-	session, _ := store.Get(req, sessionName)
-	auth, ok := session.Values["authenticated"].(bool)
-	if !auth || !ok {
-		http.Error(w, "Forbidden", http.StatusForbidden)
+	if err := CheckSession(w, req); err != nil {
 		return
 	}
+
 	req.ParseForm()
 	name := req.Form.Get("name")
 	if name == "" {
-		http.Error(w, "Missing playerName paramater", http.StatusBadRequest)
+		http.Error(w, "Missing playerName parameter", http.StatusBadRequest)
 		return
 	}
 
@@ -135,16 +137,14 @@ func (ttts *TicTacToeServer) NewPlayer(w http.ResponseWriter, req *http.Request)
 }
 
 func (ttts *TicTacToeServer) RegenerateToken(w http.ResponseWriter, req *http.Request) {
-	session, _ := store.Get(req, sessionName)
-	auth, ok := session.Values["authenticated"].(bool)
-	if !auth || !ok {
-		http.Error(w, "Forbidden", http.StatusForbidden)
+	if err := CheckSession(w, req); err != nil {
 		return
 	}
+
 	req.ParseForm()
 	token := req.Form.Get("token")
 	if token == "" {
-		http.Error(w, "Missing Token paramater", http.StatusBadRequest)
+		http.Error(w, "Missing Token parameter", http.StatusBadRequest)
 		return
 	}
 

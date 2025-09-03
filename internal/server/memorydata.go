@@ -2,6 +2,7 @@ package server
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -42,16 +43,21 @@ func (f *FetchedData) GetDataByToken(token string) (int, error) {
 }
 
 func (f *FetchedData) NewPlayer(name string) {
-	new_ID := len(f.data) + 1
-	f.data[new_ID] = Player{
+	newID := 0
+	for id := range f.data {
+		if id > newID {
+			newID = id
+		}
+	}
+	newID++
+
+	f.data[newID] = Player{
 		Name:           name,
 		Token:          uuid.NewString(),
 		IsBanned:       false,
-		DateOfRegister: "2/2/26",
+		DateOfRegister: time.Now().UTC().Format(time.RFC3339),
 	}
-
 }
-
 func (f *FetchedData) RegenerateToken(token string) error {
 	id, err := f.GetDataByToken(token)
 	if err != nil {
