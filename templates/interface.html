@@ -19,20 +19,37 @@
         function fillElements(data) {
             const placeholder = document.getElementById("data-placeholder");
             const template = document.getElementById("player-template");
-            
+            placeholder.innerHTML = ""; // Clear previous content
 
             Object.values(data).forEach(player => {
                 const clone = template.content.cloneNode(true);
+
                 clone.querySelector(".player-name").textContent = `Name: ${player.name}`;
                 clone.querySelector(".player-token").textContent = `Token: ${player.token}`;
                 clone.querySelector(".player-register").textContent = `Date of Register: ${player.dateOfRegister}`;
                 clone.querySelector(".player-banned").textContent = `Banned: ${player.isBanned}`;
-                if (player.isBanned) {
-                    clone.querySelector("#ban-btn").textContent = "Enable";
-                }
-                else {
-                    clone.querySelector("#ban-btn").textContent = "Ban";
-                }
+                clone.querySelector("#tokenplaceholder").value = player.token;
+
+                const banBtn = clone.querySelector("#ban-btn");
+                banBtn.textContent = player.isBanned ? "Enable" : "Ban";
+                banBtn.addEventListener("click", function() {
+                    alert(`Ban/Enable clicked for token: ${player.token}`);
+                });
+
+                const regenBtn = clone.querySelector(".regen-btn");
+                regenBtn.addEventListener("click", function() {
+                    var xhr = new XMLHttpRequest();
+                    xhr.open('POST', '/regeneratetoken/', true);
+                    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+                    xhr.send(`token=${player.token}`);
+                    location.reload()
+                });
+
+                const removeBtn = clone.querySelector(".remove-btn:not(#ban-btn)");
+                removeBtn.addEventListener("click", function() {
+                    alert(`Remove clicked for token: ${player.token}`);
+                });
+
                 placeholder.appendChild(clone);
             });
         }
@@ -105,6 +122,7 @@
                 <h4 class="player-token"></h4>
                 <h4 class="player-register"></h4>
                 <h4 class="player-banned"></h4>
+                <input type="hidden" name="token" id="tokenplaceholder">
             </div>
             <div class="button-container">
                 <button class="regen-btn">Regenerate Token</button>

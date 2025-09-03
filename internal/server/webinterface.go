@@ -133,3 +133,20 @@ func (ttts *TicTacToeServer) NewPlayer(w http.ResponseWriter, req *http.Request)
 	dataStore.NewPlayer(name)
 	http.Redirect(w, req, "/ainterface/", http.StatusSeeOther)
 }
+
+func (ttts *TicTacToeServer) RegenerateToken(w http.ResponseWriter, req *http.Request) {
+	session, _ := store.Get(req, sessionName)
+	auth, ok := session.Values["authenticated"].(bool)
+	if !auth || !ok {
+		http.Error(w, "Forbidden", http.StatusForbidden)
+		return
+	}
+	req.ParseForm()
+	token := req.Form.Get("token")
+	if token == "" {
+		http.Error(w, "Missing Token paramater", http.StatusBadRequest)
+		return
+	}
+
+	dataStore.RegenerateToken(token)
+}

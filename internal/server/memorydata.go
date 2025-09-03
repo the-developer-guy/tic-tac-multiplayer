@@ -32,6 +32,15 @@ func (f *FetchedData) GetDataByID(id int) (*Player, error) {
 	return nil, fmt.Errorf("Player is not found.")
 }
 
+func (f *FetchedData) GetDataByToken(token string) (int, error) {
+	for id, player := range f.data {
+		if player.Token == token {
+			return id, nil
+		}
+	}
+	return 0, fmt.Errorf("No player found with this Token.")
+}
+
 func (f *FetchedData) NewPlayer(name string) {
 	new_ID := len(f.data) + 1
 	f.data[new_ID] = Player{
@@ -41,4 +50,16 @@ func (f *FetchedData) NewPlayer(name string) {
 		DateOfRegister: "2/2/26",
 	}
 
+}
+
+func (f *FetchedData) RegenerateToken(token string) error {
+	id, err := f.GetDataByToken(token)
+	if err != nil {
+		return fmt.Errorf("Error regenerating token.")
+	}
+	player := f.data[id]
+	player.Token = uuid.NewString()
+	f.data[id] = player
+
+	return nil
 }

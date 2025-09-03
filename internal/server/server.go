@@ -34,6 +34,7 @@ func (ttts *TicTacToeServer) RegisterHandles() {
 	http.HandleFunc("/ainterface/", ttts.ainterFace)
 	http.HandleFunc("/fetchdata/", ttts.GetData)
 	http.HandleFunc("/manualnewplayer/", ttts.NewPlayer)
+	http.HandleFunc("/regeneratetoken/", ttts.RegenerateToken)
 }
 
 func (ttts *TicTacToeServer) AddLobby(lobby *Lobby) {
