@@ -29,9 +29,7 @@ func (ttts *TicTacToeServer) RegisterApiHandles() {
 
 func (ttts *TicTacToeServer) RegisterAdminHandles() {
 	http.HandleFunc("GET /admin/players/", ttts.HandleAdminListPlayers)
-}
 
-func (ttts *TicTacToeServer) RegisterInterfaceHandlers() {
 	http.HandleFunc("/login/", ttts.LoginPage)
 	http.HandleFunc("POST /accessc", ttts.accessControl)
 	http.HandleFunc("/ainterface/", ttts.ainterFace)
@@ -41,6 +39,7 @@ func (ttts *TicTacToeServer) RegisterInterfaceHandlers() {
 	http.HandleFunc("POST /handleplayeraccess/", ttts.BanOrEnablePlayer)
 	http.HandleFunc("POST /removeplayer/", ttts.RemoveUser)
 }
+
 func (ttts *TicTacToeServer) AddLobby(lobby *Lobby) {
 	ttts.lobbiesLock.Lock()
 	// TODO add check if lobby ID exists
