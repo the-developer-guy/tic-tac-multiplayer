@@ -9,8 +9,6 @@
             const xhttp = new XMLHttpRequest;
             xhttp.onload = function() {
               const data = JSON.parse(this.responseText)
-              console.log(data["1"]);
-              console.log(data);
               fillElements(data);
              }
              xhttp.open("GET", "/fetchdata/", true) 
@@ -45,11 +43,6 @@
 
                 const regenBtn = clone.querySelector(".regen-btn");
                 regenBtn.addEventListener("click", function() {
-                    var xhr = new XMLHttpRequest();
-                    xhr.open('POST', '/regeneratetoken/', true);
-                    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-                    xhr.send(`token=${player.token}`);
-                    location.reload() 
                     sendRequest(player.token, "/regeneratetoken/")
 
                 });
