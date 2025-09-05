@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <script>
-        function sendRequest() {
+        function fetchData() {
             const xhttp = new XMLHttpRequest;
             xhttp.onload = function() {
               const data = JSON.parse(this.responseText)
@@ -15,6 +15,13 @@
              }
              xhttp.open("GET", "/fetchdata/", true) 
              xhttp.send();
+        }
+        function sendRequest(token, endpoint) {
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', endpoint, true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.send(`token=${token}`);
+            location.reload() 
         }
         function fillElements(data) {
             const placeholder = document.getElementById("data-placeholder");
@@ -33,11 +40,7 @@
                 const banBtn = clone.querySelector("#ban-btn");
                 banBtn.textContent = player.isBanned ? "Enable" : "Ban";
                 banBtn.addEventListener("click", function() {
-                    var xhr = new XMLHttpRequest();
-                    xhr.open('POST', '/handleplayeraccess/', true);
-                    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-                    xhr.send(`token=${player.token}`);
-                    location.reload() 
+                    sendRequest(player.token, "/handleplayeraccess/")
                 });
 
                 const regenBtn = clone.querySelector(".regen-btn");
@@ -47,22 +50,20 @@
                     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
                     xhr.send(`token=${player.token}`);
                     location.reload() 
+                    sendRequest(player.token, "/regeneratetoken/")
+
                 });
 
                 const removeBtn = clone.querySelector(".remove-btn:not(#ban-btn)");
                 removeBtn.addEventListener("click", function() {
-                    var xhr = new XMLHttpRequest();
-                    xhr.open('POST', '/removeplayer/', true);
-                    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-                    xhr.send(`token=${player.token}`);
-                    location.reload() 
+                    sendRequest(player.token, "/removeplayer/")
                 });
 
                 placeholder.appendChild(clone);
             });
         }
         
-        sendRequest();
+        fetchData();
     </script>
     <style>
         * {
