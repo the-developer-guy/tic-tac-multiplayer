@@ -28,13 +28,6 @@ func (ttts *TicTacToeServer) HandleReadyPlayer(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	r.ParseForm()
-	token := r.Form.Get("token")
-	if token == "" {
-		http.Error(w, "Missing token", http.StatusBadRequest)
-		return
-	}
-
 	placeholder := "{\"lobbyId\": \"\", \"nextGame\": 0}"
 
 	w.Header().Set("Content-Type", "application/json")
