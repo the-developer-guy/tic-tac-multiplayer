@@ -58,16 +58,17 @@ func (f *FetchedData) NewPlayer(name string) {
 		DateOfRegister: time.Now().UTC().Format(time.RFC3339),
 	}
 }
-func (f *FetchedData) RegenerateToken(token string) error {
+func (f *FetchedData) RegenerateToken(token string) (string, error) {
 	id, err := f.GetDataByToken(token)
 	if err != nil {
-		return fmt.Errorf("Error regenerating token.")
+		return "", fmt.Errorf("Error regenerating token.")
 	}
 	player := f.data[id]
-	player.Token = uuid.NewString()
+	new_token := uuid.NewString()
+	player.Token = new_token
 	f.data[id] = player
 
-	return nil
+	return new_token, nil
 }
 
 func (f *FetchedData) HandlePlayerAccess(token string) error {

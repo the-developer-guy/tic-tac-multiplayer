@@ -23,6 +23,10 @@ var (
 
 )
 
+type LoginStruct struct {
+	LoginFailed bool
+}
+
 func (ttts *TicTacToeServer) LoginPage(w http.ResponseWriter, req *http.Request) {
 	t, err := template.ParseFiles("./templates/login.html")
 	if err != nil {
@@ -39,11 +43,7 @@ func (ttts *TicTacToeServer) LoginPage(w http.ResponseWriter, req *http.Request)
 		loginFailed = true
 	}
 
-	data := struct {
-		LoginFailed bool
-	}{
-		LoginFailed: loginFailed,
-	}
+	data := LoginStruct{LoginFailed: loginFailed}
 
 	if err := t.Execute(w, data); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -135,6 +135,21 @@ func (ttts *TicTacToeServer) NewPlayer(w http.ResponseWriter, req *http.Request)
 	http.Redirect(w, req, "/adminpage/", http.StatusSeeOther)
 }
 
+func (ttts *TicTacToeServer) RemoveUser(w http.ResponseWriter, req *http.Request) {
+	if err := CheckSession(w, req); err != nil {
+		return
+	}
+
+	req.ParseForm()
+	token := req.Form.Get("token")
+	if token == "" {
+		http.Error(w, "Missing Token parameter", http.StatusBadRequest)
+		return
+	}
+	dataStore.RemovePlayer(token)
+	w.WriteHeader(http.StatusOK)
+}
+
 func (ttts *TicTacToeServer) RegenerateToken(w http.ResponseWriter, req *http.Request) {
 	if err := CheckSession(w, req); err != nil {
 		return
@@ -165,19 +180,4 @@ func (ttts *TicTacToeServer) EditPlayerPermissions(w http.ResponseWriter, req *h
 	dataStore.HandlePlayerAccess(token)
 	w.WriteHeader(http.StatusOK)
 
-}
-
-func (ttts *TicTacToeServer) RemoveUser(w http.ResponseWriter, req *http.Request) {
-	if err := CheckSession(w, req); err != nil {
-		return
-	}
-
-	req.ParseForm()
-	token := req.Form.Get("token")
-	if token == "" {
-		http.Error(w, "Missing Token parameter", http.StatusBadRequest)
-		return
-	}
-	dataStore.RemovePlayer(token)
-	w.WriteHeader(http.StatusOK)
 }
