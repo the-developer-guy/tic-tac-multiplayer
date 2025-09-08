@@ -67,8 +67,8 @@ func (ttts *TicTacToeServer) accessControl(w http.ResponseWriter, req *http.Requ
 		return
 	}
 
-	username := req.Form.Get("usr")
-	password := req.Form.Get("pass")
+	username := req.Form.Get("user")
+	password := req.Form.Get("password")
 
 	adminUser := envFile["ADMIN_USER"]
 	adminPass := envFile["ADMIN_PASS"]
@@ -89,7 +89,7 @@ func (ttts *TicTacToeServer) accessControl(w http.ResponseWriter, req *http.Requ
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
-		http.Redirect(w, req, "/ainterface/", http.StatusSeeOther)
+		http.Redirect(w, req, "/adminpage/", http.StatusSeeOther)
 		return
 	}
 
@@ -99,7 +99,7 @@ func (ttts *TicTacToeServer) accessControl(w http.ResponseWriter, req *http.Requ
 	http.Redirect(w, req, "/login/", http.StatusSeeOther)
 }
 
-func (ttts *TicTacToeServer) ainterFace(w http.ResponseWriter, req *http.Request) {
+func (ttts *TicTacToeServer) adminPage(w http.ResponseWriter, req *http.Request) {
 	if err := CheckSession(w, req); err != nil {
 		return
 	}
@@ -132,7 +132,7 @@ func (ttts *TicTacToeServer) NewPlayer(w http.ResponseWriter, req *http.Request)
 	}
 
 	dataStore.NewPlayer(name)
-	http.Redirect(w, req, "/ainterface/", http.StatusSeeOther)
+	http.Redirect(w, req, "/adminpage/", http.StatusSeeOther)
 }
 
 func (ttts *TicTacToeServer) RegenerateToken(w http.ResponseWriter, req *http.Request) {
@@ -151,7 +151,7 @@ func (ttts *TicTacToeServer) RegenerateToken(w http.ResponseWriter, req *http.Re
 	w.WriteHeader(http.StatusOK)
 }
 
-func (ttts *TicTacToeServer) BanOrEnablePlayer(w http.ResponseWriter, req *http.Request) {
+func (ttts *TicTacToeServer) EditPlayerPermissions(w http.ResponseWriter, req *http.Request) {
 	if err := CheckSession(w, req); err != nil {
 		return
 	}

@@ -15,8 +15,8 @@ func (ttts *TicTacToeServer) GenerateGrid() TicTacToeGrid {
 
 func (ttts *TicTacToeServer) HandleAdminListPlayers(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
-	adminToken := r.Form.Get("atoken")
-	envAdminToken := envFile["ATOKEN"]
+	adminToken := r.Form.Get("admintoken")
+	envAdminToken := envFile["ADMIN_TOKEN"]
 
 	if adminToken != envAdminToken {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)

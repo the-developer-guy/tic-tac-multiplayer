@@ -32,11 +32,11 @@ func (ttts *TicTacToeServer) RegisterAdminHandles() {
 
 	http.HandleFunc("/login/", ttts.LoginPage)
 	http.HandleFunc("POST /accessc", ttts.accessControl)
-	http.HandleFunc("/ainterface/", ttts.ainterFace)
+	http.HandleFunc("/adminpage/", ttts.adminPage)
 	http.HandleFunc("/fetchdata/", ttts.GetData)
 	http.HandleFunc("POST /manualnewplayer/", ttts.NewPlayer)
 	http.HandleFunc("POST /regeneratetoken/", ttts.RegenerateToken)
-	http.HandleFunc("POST /handleplayeraccess/", ttts.BanOrEnablePlayer)
+	http.HandleFunc("POST /handleplayeraccess/", ttts.EditPlayerPermissions)
 	http.HandleFunc("POST /removeplayer/", ttts.RemoveUser)
 }
 
