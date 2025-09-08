@@ -32,18 +32,25 @@ type Player struct {
 }
 
 type Lobby struct {
-	Players *map[string]string `json:"players"`
-	LobbyID string             `json:"lobbyID"`
-	Grid    *TicTacToeGrid     `json:"gameGrid"`
-	lock    sync.Mutex         // TODO add access methods to Lobby
+	PlayerAMark string `json:"playerAMark"`
+	PlayerBMark string `json:"playerBMark"`
+
+	PlayerAToken string `json:"playerAToken"`
+	PlayerBToken string `json:"playerBToken"`
+
+	LobbyID string         `json:"lobbyID"`
+	Grid    *TicTacToeGrid `json:"gameGrid"`
+	lock    sync.Mutex     // TODO add access methods to Lobby
 }
 
 func NewLobby(token1 string, token2 string) *Lobby {
 	return &Lobby{
-		Players: &map[string]string{
-			MarkX.String(): token1,
-			MarkO.String(): token2,
-		},
+		PlayerAMark: MarkX.String(),
+		PlayerBMark: MarkO.String(),
+
+		PlayerAToken: token1,
+		PlayerBToken: token2,
+
 		LobbyID: uuid.NewString(),
 		Grid:    NewTicTacToeGrid(),
 	}
