@@ -36,7 +36,7 @@
                 clone.querySelector("#tokenplaceholder").value = player.token;
 
                 const banBtn = clone.querySelector("#ban-btn");
-                banBtn.textContent = player.isBanned ? "Enable" : "Ban";
+                banBtn.textContent = player.isBanned == null ? "Ban" : "Enable";
                 banBtn.addEventListener("click", function() {
                     sendRequest(player.token, "/handleplayeraccess/")
                 });

@@ -15,9 +15,9 @@ type FetchedData struct {
 func NewFetchedData() *FetchedData {
 	return &FetchedData{
 		data: map[int]Player{
-			1: {Name: "Lakatos Tivadar", Token: "123", IsBanned: false, DateOfRegister: "1/1/26"},
-			2: {Name: "Zsoric Migmond", Token: "123asd", IsBanned: true, DateOfRegister: "1/1/26"},
-			3: {Name: "Lakatos Tivadar", Token: "asd123", IsBanned: false, DateOfRegister: "1/1/26"},
+			1: {Name: "Lakatos Tivadar", Token: "123", IsBanned: nil, DateOfRegister: "1/1/26"},
+			2: {Name: "Zsoric Migmond", Token: "123asd", IsBanned: nil, DateOfRegister: "1/1/26"},
+			3: {Name: "Lakatos Tivadar", Token: "asd123", IsBanned: nil, DateOfRegister: "1/1/26"},
 		},
 	}
 }
@@ -54,7 +54,7 @@ func (f *FetchedData) NewPlayer(name string) {
 	f.data[newID] = Player{
 		Name:           name,
 		Token:          uuid.NewString(),
-		IsBanned:       false,
+		IsBanned:       nil,
 		DateOfRegister: time.Now().UTC().Format(time.RFC3339),
 	}
 }
@@ -77,7 +77,13 @@ func (f *FetchedData) HandlePlayerAccess(token string) error {
 		return fmt.Errorf("Error interacting with Player")
 	}
 	player := f.data[id]
-	player.IsBanned = !player.IsBanned
+	if player.IsBanned != nil {
+		player.IsBanned = nil
+	} else {
+		now := time.Now()
+		player.IsBanned = &now
+	}
+
 	f.data[id] = player
 	return nil
 }
