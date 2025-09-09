@@ -82,21 +82,21 @@ func (ttts *TicTacToeServer) accessControl(w http.ResponseWriter, req *http.Requ
 
 	session, _ := store.Get(req, sessionName)
 
-	if okUser && okPass {
-		session.Values["authenticated"] = true
-		if err := session.Save(req, w); err != nil {
-			fmt.Printf("session save error: %v", err)
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			return
-		}
-		http.Redirect(w, req, "/adminpage/", http.StatusSeeOther)
+	if !okUser || !okPass {
+		session.AddFlash("invalid_credentials", "login")
+		_ = session.Save(req, w)
+
+		http.Redirect(w, req, "/login/", http.StatusSeeOther)
 		return
 	}
-
-	session.AddFlash("invalid_credentials", "login")
-	_ = session.Save(req, w)
-
-	http.Redirect(w, req, "/login/", http.StatusSeeOther)
+	session.Values["authenticated"] = true
+	if err := session.Save(req, w); err != nil {
+		fmt.Printf("session save error: %v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+	http.Redirect(w, req, "/adminpage/", http.StatusSeeOther)
+	return
 }
 
 func (ttts *TicTacToeServer) adminPage(w http.ResponseWriter, req *http.Request) {
