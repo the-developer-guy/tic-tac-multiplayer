@@ -32,7 +32,7 @@
                 clone.querySelector(".player-name").textContent = `Name: ${player.name}`;
                 clone.querySelector(".player-token").textContent = `Token: ${player.token}`;
                 clone.querySelector(".player-register").textContent = `Date of Register: ${player.dateOfRegister}`;
-                clone.querySelector(".player-banned").textContent = `Banned: ${player.isBanned}`;
+                clone.querySelector(".player-banned").textContent = player.isBanned != null ? `Banned: ${player.isBanned}` : "Banned: Not banned"
                 clone.querySelector("#tokenplaceholder").value = player.token;
 
                 const banBtn = clone.querySelector("#ban-btn");

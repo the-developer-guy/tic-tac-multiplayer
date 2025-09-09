@@ -8,7 +8,6 @@ import (
 
 	"github.com/gorilla/securecookie"
 	"github.com/gorilla/sessions"
-	"github.com/lpernett/godotenv"
 )
 
 var (
@@ -17,9 +16,7 @@ var (
 	store   = sessions.NewCookieStore(authKey, encKey)
 
 	sessionName = "ttt_session"
-	envFile, _  = godotenv.Read(".env")
-
-	dataStore = NewFetchedData() //Temporary, it has to be changed as soon DB is implemented.
+	dataStore   = NewFetchedData() //Temporary, it has to be changed as soon DB is implemented.
 
 )
 
@@ -36,7 +33,7 @@ func (ttts *TicTacToeServer) LoginPage(w http.ResponseWriter, req *http.Request)
 
 	session, _ := store.Get(req, sessionName)
 	flashes := session.Flashes("login")
-	_ = session.Save(req, w) // It removes the flashes after reading.
+	session.Save(req, w) // It removes the flashes after reading.
 
 	var loginFailed bool
 	if len(flashes) > 0 {
@@ -52,7 +49,12 @@ func (ttts *TicTacToeServer) LoginPage(w http.ResponseWriter, req *http.Request)
 }
 
 func CheckSession(w http.ResponseWriter, req *http.Request) error {
-	session, _ := store.Get(req, sessionName)
+	session, err := store.Get(req, sessionName)
+	if err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		fmt.Printf("failed to save session in accessControl: %v\n", err)
+	}
+
 	auth, ok := session.Values["authenticated"].(bool)
 	if !auth || !ok {
 		http.Error(w, "Forbidden", http.StatusForbidden)

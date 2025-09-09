@@ -5,7 +5,26 @@ import (
 	"errors"
 	"net/http"
 	"sync"
+
+	"github.com/lpernett/godotenv"
 )
+
+var (
+	envFile, _ = godotenv.Read(".env")
+)
+
+func checkEnvs() {
+	envs := []string{
+		envFile["ADMIN_USER"],
+		envFile["ADMIN_PASS"],
+		envFile["ADMIN_TOKEN"],
+	}
+	for _, val := range envs {
+		if val == "" {
+			panic("Missing configruation")
+		}
+	}
+}
 
 type TicTacToeServer struct {
 	Lobbies     map[string]*Lobby
@@ -13,6 +32,7 @@ type TicTacToeServer struct {
 }
 
 func NewTicTacToeServer() *TicTacToeServer {
+	checkEnvs()
 	ttts := TicTacToeServer{
 		Lobbies: make(map[string]*Lobby),
 	}
