@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
+	"os"
 
 	"github.com/gorilla/securecookie"
 	"github.com/gorilla/sessions"
@@ -72,8 +73,8 @@ func (ttts *TicTacToeServer) accessControl(w http.ResponseWriter, req *http.Requ
 	username := req.Form.Get("user")
 	password := req.Form.Get("password")
 
-	adminUser := envFile["ADMIN_USER"]
-	adminPass := envFile["ADMIN_PASS"]
+	adminUser := os.Getenv("ADMIN_USER")
+	adminPass := os.Getenv("ADMIN_PASS")
 	if adminUser == "" || adminPass == "" {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
