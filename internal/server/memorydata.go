@@ -15,9 +15,9 @@ type FetchedData struct {
 func NewFetchedData() *FetchedData {
 	return &FetchedData{
 		data: map[int]Player{
-			1: {Name: "Lakatos Tivadar", Token: "123", IsBanned: nil, DateOfRegister: "1/1/26"},
-			2: {Name: "Zsoric Migmond", Token: "123asd", IsBanned: nil, DateOfRegister: "1/1/26"},
-			3: {Name: "Lakatos Tivadar", Token: "asd123", IsBanned: nil, DateOfRegister: "1/1/26"},
+			1: {Name: "Lakatos Tivadar", Token: "123", IsBanned: nil, DateOfRegister: "1/1/26", Scores: &PlayerScores{Amount_Won: 0, Amount_Lost: 0, Amount_Drawn: 0}},
+			2: {Name: "Zsoric Migmond", Token: "123asd", IsBanned: nil, DateOfRegister: "1/1/26", Scores: &PlayerScores{Amount_Won: 0, Amount_Lost: 0, Amount_Drawn: 0}},
+			3: {Name: "Lakatos Tivadar", Token: "asd123", IsBanned: nil, DateOfRegister: "1/1/26", Scores: &PlayerScores{Amount_Won: 0, Amount_Lost: 0, Amount_Drawn: 0}},
 		},
 	}
 }

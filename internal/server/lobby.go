@@ -25,11 +25,18 @@ func (m Mark) String() string {
 	}
 }
 
+type PlayerScores struct {
+	Amount_Won   int `json:"amount_Won"`
+	Amount_Lost  int `json:"amount_Lost"`
+	Amount_Drawn int `json:"amount_Drawn"`
+}
+
 type Player struct {
-	Name           string     `json:"name"`
-	Token          string     `json:"token"`
-	IsBanned       *time.Time `json:"isBanned"`
-	DateOfRegister string     `json:"dateOfRegister"`
+	Name           string        `json:"name"`
+	Token          string        `json:"token"`
+	IsBanned       *time.Time    `json:"isBanned"`
+	DateOfRegister string        `json:"dateOfRegister"`
+	Scores         *PlayerScores `json:"scores"`
 }
 
 type Lobby struct {
