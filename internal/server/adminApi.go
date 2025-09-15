@@ -2,6 +2,7 @@ package server
 
 import (
 	"net/http"
+	"os"
 )
 
 func (ttts *TicTacToeServer) GenerateGrid() TicTacToeGrid {
@@ -15,8 +16,10 @@ func (ttts *TicTacToeServer) GenerateGrid() TicTacToeGrid {
 
 func (ttts *TicTacToeServer) HandleAdminListPlayers(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
-	adminToken := r.Form.Get("atoken")
-	if adminToken != "admin" { //TODO: Must be replaced in the future
+	adminToken := r.Form.Get("admintoken")
+	envAdminToken := os.Getenv("ADMIN_TOKEN")
+
+	if adminToken != envAdminToken {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}

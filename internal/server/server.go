@@ -4,8 +4,34 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"os"
 	"sync"
 )
+
+type AppConfig struct {
+	AdminUser     string
+	AdminPassword string
+	AdminToken    string
+}
+
+func loadConfig() {
+
+	ac := AppConfig{
+		AdminUser:     os.Getenv("ADMIN_USER"),
+		AdminPassword: os.Getenv("ADMIN_PASS"),
+		AdminToken:    os.Getenv("ADMIN_TOKEN"),
+	}
+
+	if ac.AdminUser == "" {
+		panic("Missing admin username from config")
+	}
+	if ac.AdminPassword == "" {
+		panic("Missing admin password from config")
+	}
+	if ac.AdminToken == "" {
+		panic("Missing admin token from config")
+	}
+}
 
 type TicTacToeServer struct {
 	Lobbies     map[string]*Lobby
@@ -13,6 +39,7 @@ type TicTacToeServer struct {
 }
 
 func NewTicTacToeServer() *TicTacToeServer {
+	loadConfig()
 	ttts := TicTacToeServer{
 		Lobbies: make(map[string]*Lobby),
 	}
@@ -29,6 +56,14 @@ func (ttts *TicTacToeServer) RegisterApiHandles() {
 
 func (ttts *TicTacToeServer) RegisterAdminHandles() {
 	http.HandleFunc("GET /admin/players/", ttts.HandleAdminListPlayers)
+
+	http.HandleFunc("/login/", ttts.LoginPage)
+	http.HandleFunc("POST /accessc", ttts.accessControl)
+	http.HandleFunc("/adminpage/", ttts.adminPage)
+	http.HandleFunc("/fetchdata/", ttts.GetData)
+	http.HandleFunc("POST /manualnewplayer/", ttts.NewPlayer)
+	http.HandleFunc("POST /regeneratetoken/", ttts.RegenerateToken)
+	http.HandleFunc("POST /handleplayeraccess/", ttts.EditPlayerPermissions)
 }
 
 func (ttts *TicTacToeServer) AddLobby(lobby *Lobby) {

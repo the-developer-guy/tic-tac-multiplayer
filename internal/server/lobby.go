@@ -2,6 +2,7 @@ package server
 
 import (
 	"sync"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -25,12 +26,19 @@ func (m Mark) String() string {
 }
 
 type Player struct {
-	Token string `json:"token"`
-	Mark  Mark   `json:"mark"`
+	Name           string     `json:"name"`
+	Token          string     `json:"token"`
+	IsBanned       *time.Time `json:"isBanned"`
+	DateOfRegister string     `json:"dateOfRegister"`
 }
 
 type Lobby struct {
-	Players *[]Player      `json:"players"`
+	PlayerAMark string `json:"playerAMark"`
+	PlayerBMark string `json:"playerBMark"`
+
+	PlayerAToken string `json:"playerAToken"`
+	PlayerBToken string `json:"playerBToken"`
+
 	LobbyID string         `json:"lobbyID"`
 	Grid    *TicTacToeGrid `json:"gameGrid"`
 	lock    sync.Mutex     // TODO add access methods to Lobby
@@ -38,10 +46,12 @@ type Lobby struct {
 
 func NewLobby(token1 string, token2 string) *Lobby {
 	return &Lobby{
-		Players: &[]Player{
-			{Token: token1, Mark: MarkX},
-			{Token: token2, Mark: MarkO},
-		},
+		PlayerAMark: MarkX.String(),
+		PlayerBMark: MarkO.String(),
+
+		PlayerAToken: token1,
+		PlayerBToken: token2,
+
 		LobbyID: uuid.NewString(),
 		Grid:    NewTicTacToeGrid(),
 	}
