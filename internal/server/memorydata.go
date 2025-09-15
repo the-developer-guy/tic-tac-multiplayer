@@ -26,7 +26,7 @@ func (f *FetchedData) GetAllData() map[int]Player {
 	return f.data
 }
 
-func (f *FetchedData) GetDataByID(id int) (*Player, error) {
+func (f *FetchedData) GetPlayerByID(id int) (*Player, error) {
 	if player, ok := f.data[id]; ok {
 		return &player, nil
 	}
@@ -71,7 +71,7 @@ func (f *FetchedData) RegenerateToken(token string) (string, error) {
 	return new_token, nil
 }
 
-func (f *FetchedData) HandlePlayerAccess(token string) error {
+func (f *FetchedData) ValidatePlayerAccess(token string) error {
 	id, err := f.GetDataByToken(token)
 	if err != nil {
 		return fmt.Errorf("Error interacting with Player")
@@ -85,16 +85,5 @@ func (f *FetchedData) HandlePlayerAccess(token string) error {
 	}
 
 	f.data[id] = player
-	return nil
-}
-
-func (f *FetchedData) RemovePlayer(token string) error {
-	id, err := f.GetDataByToken(token)
-	if err != nil {
-		fmt.Println("RemovePlayer: token not found:", token)
-		return fmt.Errorf("Error interacting with Player")
-	}
-	delete(f.data, id)
-	fmt.Println("RemovePlayer: deleted id", id)
 	return nil
 }

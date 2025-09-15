@@ -52,7 +52,6 @@ func (ttts *TicTacToeServer) LoginPage(w http.ResponseWriter, req *http.Request)
 func CheckSession(w http.ResponseWriter, req *http.Request) error {
 	session, err := store.Get(req, sessionName)
 	if err != nil {
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		fmt.Printf("failed to save session in accessControl: %v\n", err)
 	}
 
@@ -138,21 +137,6 @@ func (ttts *TicTacToeServer) NewPlayer(w http.ResponseWriter, req *http.Request)
 	http.Redirect(w, req, "/adminpage/", http.StatusSeeOther)
 }
 
-func (ttts *TicTacToeServer) RemoveUser(w http.ResponseWriter, req *http.Request) {
-	if err := CheckSession(w, req); err != nil {
-		return
-	}
-
-	req.ParseForm()
-	token := req.Form.Get("token")
-	if token == "" {
-		http.Error(w, "Missing Token parameter", http.StatusBadRequest)
-		return
-	}
-	dataStore.RemovePlayer(token)
-	w.WriteHeader(http.StatusOK)
-}
-
 func (ttts *TicTacToeServer) RegenerateToken(w http.ResponseWriter, req *http.Request) {
 	if err := CheckSession(w, req); err != nil {
 		return
@@ -180,7 +164,7 @@ func (ttts *TicTacToeServer) EditPlayerPermissions(w http.ResponseWriter, req *h
 		http.Error(w, "Missing Token parameter", http.StatusBadRequest)
 		return
 	}
-	dataStore.HandlePlayerAccess(token)
+	dataStore.ValidatePlayerAccess(token)
 	w.WriteHeader(http.StatusOK)
 
 }

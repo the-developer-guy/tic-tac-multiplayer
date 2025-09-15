@@ -14,7 +14,7 @@ type AppConfig struct {
 	AdminToken    string
 }
 
-func checkEnvs() {
+func loadConfig() {
 
 	ac := AppConfig{
 		AdminUser:     os.Getenv("ADMIN_USER"),
@@ -39,7 +39,7 @@ type TicTacToeServer struct {
 }
 
 func NewTicTacToeServer() *TicTacToeServer {
-	checkEnvs()
+	loadConfig()
 	ttts := TicTacToeServer{
 		Lobbies: make(map[string]*Lobby),
 	}
@@ -64,7 +64,6 @@ func (ttts *TicTacToeServer) RegisterAdminHandles() {
 	http.HandleFunc("POST /manualnewplayer/", ttts.NewPlayer)
 	http.HandleFunc("POST /regeneratetoken/", ttts.RegenerateToken)
 	http.HandleFunc("POST /handleplayeraccess/", ttts.EditPlayerPermissions)
-	http.HandleFunc("POST /removeplayer/", ttts.RemoveUser)
 }
 
 func (ttts *TicTacToeServer) AddLobby(lobby *Lobby) {

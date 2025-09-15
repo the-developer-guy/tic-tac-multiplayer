@@ -47,11 +47,6 @@
 
                 });
 
-                const removeBtn = clone.querySelector(".remove-btn:not(#ban-btn)");
-                removeBtn.addEventListener("click", function() {
-                    sendRequest(player.token, "/removeplayer/")
-                });
-
                 placeholder.appendChild(clone);
             });
         }
@@ -128,7 +123,6 @@
             </div>
             <div class="button-container">
                 <button class="regen-btn">Regenerate Token</button>
-                <button class="remove-btn">Remove</button>
                 <button class="remove-btn" id="ban-btn">Ban/Enable</button>
             </div>
         </div>
