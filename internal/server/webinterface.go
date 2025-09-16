@@ -180,3 +180,8 @@ func (ttts *TicTacToeServer) FetchPlayerScores(w http.ResponseWriter, req *http.
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(r)
 }
+
+func (ttts *TicTacToeServer) ScoresView(w http.ResponseWriter, req *http.Request) {
+	t, _ := template.ParseFiles("./templates/scores.html")
+	t.Execute(w, nil)
+}
