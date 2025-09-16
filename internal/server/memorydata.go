@@ -23,7 +23,6 @@ func NewFetchedData() *FetchedData {
 }
 
 func (f *FetchedData) GetAllData() map[int]Player {
-	f.GetScores()
 	return f.data
 }
 
