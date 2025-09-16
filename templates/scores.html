@@ -11,13 +11,53 @@
             xhttp.onload = function() {
               const data = JSON.parse(this.responseText)
               console.log(data)
+              fillTemplate(data);
              }
              xhttp.open("GET", "/getscores/", true) 
              xhttp.send();
     }
     fetchData()
+    function fillTemplate(data) {
+        const scoretemplate = document.getElementById("score-template");
+        const placeholder = document.getElementById("scoresholder");
+        Object.values(data).forEach(score => {
+                const clone = scoretemplate.content.cloneNode(true);
+
+                clone.querySelector(".player-name").textContent = `Name: ${score.name}`;
+                clone.querySelector(".player-won").textContent = `Won: ${score.scores.amount_Won}`;
+                clone.querySelector(".player-lost").textContent = `Lost: ${score.scores.amount_Lost}`;
+                clone.querySelector(".player-drawn").textContent = `Drawn: ${score.scores.amount_Drawn}`;
+
+        placeholder.appendChild(clone)
+    })
+}
 </script>
+<style>
+    * {
+        padding: 0;
+        margin: 0;
+    }
+    .scoresholder {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+</style>
 <body>
-    
+    <!--Template-->
+    <div class="scoresholder" id="scoresholder">
+        <template id="score-template">
+            <div class="scorecolumn">
+                <div class="namecon">
+                    <h1 class="player-name">Name</h1>
+                </div>
+                <div class="scorecon">
+                    <h4 class="player-won">Won</h4>
+                    <h4 class="player-lost">Lost</h4>
+                    <h4 class="player-drawn">Drawn</h4>
+                </div>
+            </div>
+        </template>
+    </div>
 </body>
 </html>
