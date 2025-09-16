@@ -52,6 +52,7 @@ func (ttts *TicTacToeServer) RegisterApiHandles() {
 
 	http.HandleFunc("GET /getgrid/{lobbyId}/", ttts.HandleGetGameGrid)
 	http.HandleFunc("POST /place/{lobbyId}/", ttts.HandlePlaceMark)
+	http.HandleFunc("GET /getscores/", ttts.FetchPlayerScores)
 }
 
 func (ttts *TicTacToeServer) RegisterAdminHandles() {

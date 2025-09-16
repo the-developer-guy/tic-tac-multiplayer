@@ -23,6 +23,7 @@ func NewFetchedData() *FetchedData {
 }
 
 func (f *FetchedData) GetAllData() map[int]Player {
+	f.GetScores()
 	return f.data
 }
 
@@ -86,4 +87,12 @@ func (f *FetchedData) ValidatePlayerAccess(token string) error {
 
 	f.data[id] = player
 	return nil
+}
+
+func (f *FetchedData) GetScores() map[int]FetchScores {
+	rScores := map[int]FetchScores{}
+	for i, val := range f.data {
+		rScores[i] = FetchScores{Name: val.Name, Score: *val.Scores}
+	}
+	return rScores
 }

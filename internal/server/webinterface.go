@@ -21,6 +21,11 @@ var (
 
 )
 
+type FetchScores struct {
+	Name  string       `json:"name"`
+	Score PlayerScores `json:"scores"`
+}
+
 type LoginStruct struct {
 	LoginFailed bool
 }
@@ -167,4 +172,11 @@ func (ttts *TicTacToeServer) EditPlayerPermissions(w http.ResponseWriter, req *h
 	dataStore.ValidatePlayerAccess(token)
 	w.WriteHeader(http.StatusOK)
 
+}
+
+func (ttts *TicTacToeServer) FetchPlayerScores(w http.ResponseWriter, req *http.Request) {
+	r := dataStore.GetScores()
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(r)
 }
