@@ -34,8 +34,8 @@ type PlayerScores struct {
 type Player struct {
 	Name           string        `json:"name"`
 	Token          string        `json:"token"`
-	IsBanned       *time.Time    `json:"isBanned"`
-	DateOfRegister string        `json:"dateOfRegister"`
+	BanTimestamp   *time.Time    `json:"banTimestamp"`
+	DateOfRegister time.Time     `json:"dateOfRegister"`
 	Scores         *PlayerScores `json:"scores"`
 }
 
