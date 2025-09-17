@@ -23,9 +23,9 @@
                 const clone = scoretemplate.content.cloneNode(true);
 
                 clone.querySelector(".player-name").textContent = `Name: ${score.name}`;
-                clone.querySelector(".player-won").textContent = `Won: ${score.scores.amount_Won}`;
-                clone.querySelector(".player-lost").textContent = `Lost: ${score.scores.amount_Lost}`;
-                clone.querySelector(".player-drawn").textContent = `Drawn: ${score.scores.amount_Drawn}`;
+                clone.querySelector(".player-won").textContent = `Won: ${score.scores.winCount}`;
+                clone.querySelector(".player-lost").textContent = `Lost: ${score.scores.loseCount}`;
+                clone.querySelector(".player-drawn").textContent = `Drawn: ${score.scores.tieCount}`;
 
         placeholder.appendChild(clone)
     })

@@ -26,9 +26,9 @@ func (m Mark) String() string {
 }
 
 type PlayerScores struct {
-	Amount_Won   int `json:"amount_Won"`
-	Amount_Lost  int `json:"amount_Lost"`
-	Amount_Drawn int `json:"amount_Drawn"`
+	WinCount  int `json:"winCount"`
+	LoseCount int `json:"loseCount"`
+	TieCount  int `json:"tieCount"`
 }
 
 type Player struct {
