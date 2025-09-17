@@ -30,7 +30,7 @@ type LoginStruct struct {
 	LoginFailed bool
 }
 
-func (ttts *TicTacToeServer) LoginPage(w http.ResponseWriter, req *http.Request) {
+func (ttts *TicTacToeServer) HandleLoginView(w http.ResponseWriter, req *http.Request) {
 	t, err := template.ParseFiles("./templates/login.html")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -68,7 +68,7 @@ func CheckSession(w http.ResponseWriter, req *http.Request) error {
 	return nil
 }
 
-func (ttts *TicTacToeServer) accessControl(w http.ResponseWriter, req *http.Request) {
+func (ttts *TicTacToeServer) HandleAccessControl(w http.ResponseWriter, req *http.Request) {
 	if err := req.ParseForm(); err != nil {
 		http.Error(w, "Bad Request", http.StatusBadRequest)
 		return
@@ -106,7 +106,7 @@ func (ttts *TicTacToeServer) accessControl(w http.ResponseWriter, req *http.Requ
 	return
 }
 
-func (ttts *TicTacToeServer) adminPage(w http.ResponseWriter, req *http.Request) {
+func (ttts *TicTacToeServer) HandleAdminView(w http.ResponseWriter, req *http.Request) {
 	if err := CheckSession(w, req); err != nil {
 		return
 	}
@@ -115,7 +115,7 @@ func (ttts *TicTacToeServer) adminPage(w http.ResponseWriter, req *http.Request)
 	t.Execute(w, nil)
 }
 
-func (ttts *TicTacToeServer) GetData(w http.ResponseWriter, req *http.Request) {
+func (ttts *TicTacToeServer) HandleGetData(w http.ResponseWriter, req *http.Request) {
 	if err := CheckSession(w, req); err != nil {
 		return
 	}
@@ -126,7 +126,7 @@ func (ttts *TicTacToeServer) GetData(w http.ResponseWriter, req *http.Request) {
 	json.NewEncoder(w).Encode(allPlayers)
 }
 
-func (ttts *TicTacToeServer) NewPlayer(w http.ResponseWriter, req *http.Request) {
+func (ttts *TicTacToeServer) HandleNewPlayer(w http.ResponseWriter, req *http.Request) {
 	if err := CheckSession(w, req); err != nil {
 		return
 	}
@@ -142,7 +142,7 @@ func (ttts *TicTacToeServer) NewPlayer(w http.ResponseWriter, req *http.Request)
 	http.Redirect(w, req, "/adminpage/", http.StatusSeeOther)
 }
 
-func (ttts *TicTacToeServer) RegenerateToken(w http.ResponseWriter, req *http.Request) {
+func (ttts *TicTacToeServer) HandleRegenerateToken(w http.ResponseWriter, req *http.Request) {
 	if err := CheckSession(w, req); err != nil {
 		return
 	}
@@ -158,7 +158,7 @@ func (ttts *TicTacToeServer) RegenerateToken(w http.ResponseWriter, req *http.Re
 	w.WriteHeader(http.StatusOK)
 }
 
-func (ttts *TicTacToeServer) EditPlayerPermissions(w http.ResponseWriter, req *http.Request) {
+func (ttts *TicTacToeServer) HandleEditPlayerPermissions(w http.ResponseWriter, req *http.Request) {
 	if err := CheckSession(w, req); err != nil {
 		return
 	}
@@ -174,14 +174,14 @@ func (ttts *TicTacToeServer) EditPlayerPermissions(w http.ResponseWriter, req *h
 
 }
 
-func (ttts *TicTacToeServer) FetchPlayerScores(w http.ResponseWriter, req *http.Request) {
+func (ttts *TicTacToeServer) HandleFetchPlayerScores(w http.ResponseWriter, req *http.Request) {
 	r := dataStore.GetScores()
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(r)
 }
 
-func (ttts *TicTacToeServer) ScoresView(w http.ResponseWriter, req *http.Request) {
+func (ttts *TicTacToeServer) HandleScoresView(w http.ResponseWriter, req *http.Request) {
 	t, _ := template.ParseFiles("./templates/scores.html")
 	t.Execute(w, nil)
 }

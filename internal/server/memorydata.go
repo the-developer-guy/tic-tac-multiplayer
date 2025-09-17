@@ -56,6 +56,7 @@ func (f *FetchedData) NewPlayer(name string) {
 		Token:          uuid.NewString(),
 		BanTimestamp:   nil,
 		DateOfRegister: time.Now(),
+		Scores:         &PlayerScores{WinCount: 0, LoseCount: 0, TieCount: 0},
 	}
 }
 func (f *FetchedData) RegenerateToken(token string) (string, error) {
