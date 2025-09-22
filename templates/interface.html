@@ -32,11 +32,11 @@
                 clone.querySelector(".player-name").textContent = `Name: ${player.name}`;
                 clone.querySelector(".player-token").textContent = `Token: ${player.token}`;
                 clone.querySelector(".player-register").textContent = `Date of Register: ${player.dateOfRegister}`;
-                clone.querySelector(".player-banned").textContent = player.isBanned != null ? `Banned: ${player.isBanned}` : "Banned: Not banned"
+                clone.querySelector(".player-banned").textContent = player.banTimestamp != null ? `Banned: ${player.banTimestamp}` : "Banned: Not banned"
                 clone.querySelector("#tokenplaceholder").value = player.token;
 
                 const banBtn = clone.querySelector("#ban-btn");
-                banBtn.textContent = player.isBanned == null ? "Ban" : "Enable";
+                banBtn.textContent = player.banTimestamp == null ? "Ban" : "Enable";
                 banBtn.addEventListener("click", function() {
                     sendRequest(player.token, "/handleplayeraccess/")
                 });

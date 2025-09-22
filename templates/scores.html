@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<script>
+    function fetchData() {
+            const xhttp = new XMLHttpRequest;
+            xhttp.onload = function() {
+              const data = JSON.parse(this.responseText)
+              fillTemplate(data);
+             }
+             xhttp.open("GET", "/getscores/", true) 
+             xhttp.send();
+    }
+    fetchData()
+    function fillTemplate(data) {
+        const scoretemplate = document.getElementById("score-template");
+        const placeholder = document.getElementById("scoresholder");
+        Object.values(data).forEach(score => {
+                const clone = scoretemplate.content.cloneNode(true);
+
+                clone.querySelector(".player-name").textContent = `Name: ${score.name}`;
+                clone.querySelector(".player-won").textContent = `Won: ${score.scores.winCount}`;
+                clone.querySelector(".player-lost").textContent = `Lost: ${score.scores.loseCount}`;
+                clone.querySelector(".player-drawn").textContent = `Drawn: ${score.scores.tieCount}`;
+
+        placeholder.appendChild(clone)
+    })
+}
+</script>
+<style>
+    * {
+        padding: 0;
+        margin: 0;
+    }
+    .scoresholder {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        height: 80vh;
+    }
+    .scorecolumn {
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        background-color: green;
+        margin-top: 10px;
+        height: 20%;
+    }
+    .namecon {
+        width: 25%;
+        display: flex;
+        align-items: center;
+        justify-content: left;
+    }
+    .scorecon {
+        width: 75%;
+        display: flex;
+        align-items: center;
+        justify-content: right;
+        gap: 5px;
+        margin-right: 10px;
+    }
+    .player-name {
+        font-size: 25px;
+    }
+</style>
+<body>
+    <!--Template-->
+    <div class="scoresholder" id="scoresholder">
+        <template id="score-template">
+            <div class="scorecolumn">
+                <div class="namecon">
+                    <h1 class="player-name">Name</h1>
+                </div>
+                <div class="scorecon">
+                    <h4 class="player-won">Won</h4>
+                    <h4 class="player-lost">Lost</h4>
+                    <h4 class="player-drawn">Drawn</h4>
+                </div>
+            </div>
+        </template>
+    </div>
+</body>
+</html>

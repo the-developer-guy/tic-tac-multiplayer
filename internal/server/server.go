@@ -52,18 +52,20 @@ func (ttts *TicTacToeServer) RegisterApiHandles() {
 
 	http.HandleFunc("GET /getgrid/{lobbyId}/", ttts.HandleGetGameGrid)
 	http.HandleFunc("POST /place/{lobbyId}/", ttts.HandlePlaceMark)
+	http.HandleFunc("GET /getscores/", ttts.HandleFetchPlayerScores)
+	http.HandleFunc("GET /scores/", ttts.HandleScoresView)
 }
 
 func (ttts *TicTacToeServer) RegisterAdminHandles() {
 	http.HandleFunc("GET /admin/players/", ttts.HandleAdminListPlayers)
 
-	http.HandleFunc("/login/", ttts.LoginPage)
-	http.HandleFunc("POST /accessc", ttts.accessControl)
-	http.HandleFunc("/adminpage/", ttts.adminPage)
-	http.HandleFunc("/fetchdata/", ttts.GetData)
-	http.HandleFunc("POST /manualnewplayer/", ttts.NewPlayer)
-	http.HandleFunc("POST /regeneratetoken/", ttts.RegenerateToken)
-	http.HandleFunc("POST /handleplayeraccess/", ttts.EditPlayerPermissions)
+	http.HandleFunc("/login/", ttts.HandleLoginView)
+	http.HandleFunc("POST /accessc", ttts.HandleAccessControl)
+	http.HandleFunc("/adminpage/", ttts.HandleAdminView)
+	http.HandleFunc("/fetchdata/", ttts.HandleGetData)
+	http.HandleFunc("POST /manualnewplayer/", ttts.HandleNewPlayer)
+	http.HandleFunc("POST /regeneratetoken/", ttts.HandleRegenerateToken)
+	http.HandleFunc("POST /handleplayeraccess/", ttts.HandleEditPlayerPermissions)
 }
 
 func (ttts *TicTacToeServer) AddLobby(lobby *Lobby) {

@@ -15,9 +15,9 @@ type FetchedData struct {
 func NewFetchedData() *FetchedData {
 	return &FetchedData{
 		data: map[int]Player{
-			1: {Name: "Lakatos Tivadar", Token: "123", IsBanned: nil, DateOfRegister: "1/1/26"},
-			2: {Name: "Zsoric Migmond", Token: "123asd", IsBanned: nil, DateOfRegister: "1/1/26"},
-			3: {Name: "Lakatos Tivadar", Token: "asd123", IsBanned: nil, DateOfRegister: "1/1/26"},
+			1: {Name: "Lakatos Tivadar", Token: "123", BanTimestamp: nil, DateOfRegister: time.Now(), Scores: &PlayerScores{WinCount: 0, LoseCount: 0, TieCount: 0}},
+			2: {Name: "Zsoric Migmond", Token: "123asd", BanTimestamp: nil, DateOfRegister: time.Now(), Scores: &PlayerScores{WinCount: 0, LoseCount: 10, TieCount: 0}},
+			3: {Name: "Lakatos Tivadar", Token: "asd123", BanTimestamp: nil, DateOfRegister: time.Now(), Scores: &PlayerScores{WinCount: 0, LoseCount: 0, TieCount: 0}},
 		},
 	}
 }
@@ -54,8 +54,9 @@ func (f *FetchedData) NewPlayer(name string) {
 	f.data[newID] = Player{
 		Name:           name,
 		Token:          uuid.NewString(),
-		IsBanned:       nil,
-		DateOfRegister: time.Now().UTC().Format(time.RFC3339),
+		BanTimestamp:   nil,
+		DateOfRegister: time.Now(),
+		Scores:         &PlayerScores{WinCount: 0, LoseCount: 0, TieCount: 0},
 	}
 }
 func (f *FetchedData) RegenerateToken(token string) (string, error) {
@@ -77,13 +78,21 @@ func (f *FetchedData) ValidatePlayerAccess(token string) error {
 		return fmt.Errorf("Error interacting with Player")
 	}
 	player := f.data[id]
-	if player.IsBanned != nil {
-		player.IsBanned = nil
+	if player.BanTimestamp != nil {
+		player.BanTimestamp = nil
 	} else {
 		now := time.Now()
-		player.IsBanned = &now
+		player.BanTimestamp = &now
 	}
 
 	f.data[id] = player
 	return nil
+}
+
+func (f *FetchedData) GetScores() map[int]FetchScores {
+	rScores := map[int]FetchScores{}
+	for i, val := range f.data {
+		rScores[i] = FetchScores{Name: val.Name, Score: *val.Scores}
+	}
+	return rScores
 }

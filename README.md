@@ -69,3 +69,11 @@ A client's reaction time is measured from the first `Get grid` call, when it's e
 Place the player's mark.
 
 Timeout, or placing the mark on an illegal coordinate immediately ends the round and the opponent wins.
+
+### Scores
+
+`GET /getscores/`
+
+Retrieves the scores for all players.
+
+Scores are also available on the `/scores/` page, but you can use this API endpoint to fetch them Automated if you want to display scores directly in your game.
