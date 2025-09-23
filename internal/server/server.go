@@ -2,7 +2,7 @@ package server
 
 import (
 	"encoding/json"
-	"errors"
+	"fmt"
 	"net/http"
 	"sync"
 
@@ -58,7 +58,12 @@ func (ttts *TicTacToeServer) AddLobby(lobby *Lobby) {
 }
 
 func (ttts *TicTacToeServer) GetLobby(lobbyId string) (*Lobby, error) {
-	return nil, errors.New("Not implemented")
+	l, ok := ttts.Lobbies[lobbyId]
+	if !ok {
+		return nil, fmt.Errorf("no lobby ID %s", lobbyId)
+	}
+
+	return l, nil
 }
 
 func (ttts *TicTacToeServer) Json() ([]byte, error) {
