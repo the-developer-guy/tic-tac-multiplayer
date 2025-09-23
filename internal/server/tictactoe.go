@@ -1,5 +1,7 @@
 package server
 
+import "errors"
+
 type TicTacToeMark struct {
 	X int `json:"x"`
 	Y int `json:"y"`
@@ -17,4 +19,16 @@ func NewTicTacToeGrid() *TicTacToeGrid {
 	}
 
 	return &tttg
+}
+
+func (tttg *TicTacToeGrid) PlaceXMark(x, y int) error {
+	return errors.New("not implemented")
+}
+
+func (tttg *TicTacToeGrid) PlaceOMark(x, y int) error {
+	return errors.New("not implemented")
+}
+
+func (tttg *TicTacToeGrid) PlaceRandomOMark() error {
+	return errors.New("not implemented")
 }
