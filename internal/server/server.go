@@ -22,6 +22,8 @@ func NewTicTacToeServer(ac *internal.AppConfig) *TicTacToeServer {
 		settings: ac,
 		Lobbies:  make(map[string]*Lobby),
 	}
+	ttts.auth.AddUser(ac.AdminUser, ac.AdminPassword)
+
 	return &ttts
 }
 
