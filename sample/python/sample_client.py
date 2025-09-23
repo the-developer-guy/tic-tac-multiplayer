@@ -1,38 +1,18 @@
-import pygame
 import network
-from gamestates import GameState
-import threading
-
-
-pygame.init()
-screen = pygame.display.set_mode((400,400))
-clock = pygame.time.Clock()
-running = True
-BACKGROUND = (255, 255, 255)
-pygame.display.set_caption("TicTacToe")
-
-current_state = GameState.LOBBY
+import random
 
 network = network.Network("http://localhost:8080/")
-thread = threading.Thread(target=network.InQueue, daemon=True)
-thread.start()
+board = [['' for _ in range(3)] for _ in range(3)]
 
- 
+def move(mark, x,y):
+    board[y][x] = mark
 
-while running:
-    screen.fill(BACKGROUND)
 
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
+move("X", 2,0)
+print(board)
 
-    if network.lobbyid != "":
-        print(network.lobbyid)
-        print(thread.is_alive())
-    
-    pygame.display.flip()
-    clock.tick(60)
+network.InQueue()
+print(network.lobbyid)
 
-pygame.quit()
 
 
