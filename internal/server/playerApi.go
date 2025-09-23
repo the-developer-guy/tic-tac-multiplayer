@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 )
 
 func (ttts *TicTacToeServer) HandlePlayerInfo(w http.ResponseWriter, r *http.Request) {
@@ -95,6 +96,11 @@ func (ttts *TicTacToeServer) HandlePlaceMark(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
+	lobby, err := ttts.GetLobby(lobbyId)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("no lobby with ID %s found", lobbyId), http.StatusInternalServerError)
+	}
+
 	r.ParseForm()
 	token := r.Form.Get("token")
 	corX := r.Form.Get("cor_x")
@@ -103,4 +109,23 @@ func (ttts *TicTacToeServer) HandlePlaceMark(w http.ResponseWriter, r *http.Requ
 		http.Error(w, "Missing Arguments", http.StatusBadRequest)
 		return
 	}
+
+	x, err := strconv.Atoi(corX)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("invalid X coordinate \"%s\"", corX), http.StatusBadRequest)
+		return
+	}
+	y, err := strconv.Atoi(corY)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("invalid Y coordinate \"%s\"", corY), http.StatusBadRequest)
+		return
+	}
+
+	err = lobby.Grid.PlaceXMark(x, y)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("failed to place mark at %d;%d: %v", x, y, err), http.StatusBadRequest)
+		return
+	}
+
+	// TODO status 200
 }
