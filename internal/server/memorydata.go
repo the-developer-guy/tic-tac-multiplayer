@@ -1,7 +1,10 @@
 package server
 
 import (
+	"encoding/json"
 	"fmt"
+	"io"
+	"os"
 	"time"
 
 	"github.com/google/uuid"
@@ -20,6 +23,20 @@ func NewFetchedData() *FetchedData {
 			3: {Name: "Lakatos Tivadar", Token: "asd123", BanTimestamp: nil, DateOfRegister: time.Now(), Scores: &PlayerScores{WinCount: 0, LoseCount: 0, TieCount: 0}},
 		},
 	}
+}
+
+func (f *FetchedData) ParseJsonFile() {
+	jsonFile, err := os.Open("./records.json")
+	if err != nil {
+		fmt.Println(err)
+	}
+	byteValue, _ := io.ReadAll(jsonFile)
+	users := map[int]Player{}
+	if err := json.Unmarshal(byteValue, &users); err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(users[1].Name)
+
 }
 
 func (f *FetchedData) GetAllData() map[int]Player {

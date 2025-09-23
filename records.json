@@ -1,0 +1,25 @@
+{
+  "1": {
+    "banTimestamp": null,
+    "dateOfRegister": "2025-09-23T10:51:00.738938+02:00",
+    "name": "Lakatos Tivadar",
+    "scores": {
+      "loseCount": 0,
+      "tieCount": 0,
+      "winCount": 0
+    },
+    "token": "123"
+  },
+
+  "2": {
+    "banTimestamp": null,
+    "dateOfRegister": "2025-09-23T10:51:00.738938+02:00",
+    "name": "Zsoric Migmond",
+    "scores": {
+      "loseCount": 0,
+      "tieCount": 0,
+      "winCount": 10
+    },
+    "token": "TOKEN343241"
+  }
+}

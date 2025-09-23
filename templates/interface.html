@@ -9,6 +9,7 @@
             const xhttp = new XMLHttpRequest;
             xhttp.onload = function() {
               const data = JSON.parse(this.responseText)
+              console.log(data);
               fillElements(data);
              }
              xhttp.open("GET", "/fetchdata/", true) 

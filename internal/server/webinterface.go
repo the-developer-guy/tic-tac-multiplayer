@@ -111,6 +111,7 @@ func (ttts *TicTacToeServer) HandleAdminView(w http.ResponseWriter, req *http.Re
 		return
 	}
 
+	dataStore.ParseJsonFile()
 	t, _ := template.ParseFiles("./templates/interface.html")
 	t.Execute(w, nil)
 }

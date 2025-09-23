@@ -11,6 +11,7 @@
             "request": "launch",
             "mode": "auto",
             "program": "server.go",
+            "console": "integratedTerminal",
             "env": {
                 "ADMIN_USER": "admin",
 		        "ADMIN_PASS": "pass",
