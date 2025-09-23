@@ -16,27 +16,25 @@ type FetchedData struct {
 
 // Constructor -> sample data
 func NewFetchedData() *FetchedData {
+	jsonData, err := ParseJsonFile()
+	if err != nil {
+		fmt.Errorf("An error occoured when parsing JSON file.")
+	}
 	return &FetchedData{
-		data: map[int]Player{
-			1: {Name: "Lakatos Tivadar", Token: "123", BanTimestamp: nil, DateOfRegister: time.Now(), Scores: &PlayerScores{WinCount: 0, LoseCount: 0, TieCount: 0}},
-			2: {Name: "Zsoric Migmond", Token: "123asd", BanTimestamp: nil, DateOfRegister: time.Now(), Scores: &PlayerScores{WinCount: 0, LoseCount: 10, TieCount: 0}},
-			3: {Name: "Lakatos Tivadar", Token: "asd123", BanTimestamp: nil, DateOfRegister: time.Now(), Scores: &PlayerScores{WinCount: 0, LoseCount: 0, TieCount: 0}},
-		},
+		data: jsonData,
 	}
 }
 
-func (f *FetchedData) ParseJsonFile() {
-	jsonFile, err := os.Open("./records.json")
-	if err != nil {
-		fmt.Println(err)
-	}
+func ParseJsonFile() (map[int]Player, error) {
+	jsonFile, _ := os.Open("./records.json")
 	byteValue, _ := io.ReadAll(jsonFile)
 	users := map[int]Player{}
 	if err := json.Unmarshal(byteValue, &users); err != nil {
 		fmt.Println(err)
+		return nil, err
 	}
-	fmt.Println(users[1].Name)
 
+	return users, nil
 }
 
 func (f *FetchedData) GetAllData() map[int]Player {
