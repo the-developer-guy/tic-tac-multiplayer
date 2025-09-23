@@ -14,13 +14,14 @@ type TicTacToeServer struct {
 	settings    *internal.AppConfig
 	Lobbies     map[string]*Lobby
 	lobbiesLock sync.Mutex
-	auth        auth.UserAuth
+	auth        *auth.UserAuth
 }
 
 func NewTicTacToeServer(ac *internal.AppConfig) *TicTacToeServer {
 	ttts := TicTacToeServer{
 		settings: ac,
 		Lobbies:  make(map[string]*Lobby),
+		auth:     auth.NewUserAuth(),
 	}
 	ttts.auth.AddUser(ac.AdminUser, ac.AdminPassword)
 

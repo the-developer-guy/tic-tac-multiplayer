@@ -8,6 +8,14 @@ type UserAuth struct {
 	Users map[string]*User
 }
 
+func NewUserAuth() *UserAuth {
+	ua := UserAuth{
+		Users: make(map[string]*User),
+	}
+
+	return &ua
+}
+
 func (ua *UserAuth) GetUser(username string) (*User, error) {
 	u, ok := ua.Users[username]
 	if !ok {
