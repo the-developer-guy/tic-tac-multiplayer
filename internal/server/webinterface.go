@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
-	"os"
 
 	"github.com/gorilla/securecookie"
 	"github.com/gorilla/sessions"
@@ -77,25 +76,25 @@ func (ttts *TicTacToeServer) HandleAccessControl(w http.ResponseWriter, req *htt
 	username := req.Form.Get("user")
 	password := req.Form.Get("password")
 
-	adminUser := os.Getenv("ADMIN_USER")
-	adminPass := os.Getenv("ADMIN_PASS")
-	if adminUser == "" || adminPass == "" {
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return
-	}
-
-	okUser := adminUser == username
-	okPass := adminPass == password
-
 	session, _ := store.Get(req, sessionName)
 
-	if !okUser || !okPass {
+	user, err := ttts.auth.GetUser(username)
+	if err != nil {
 		session.AddFlash("invalid_credentials", "login")
 		_ = session.Save(req, w)
 
 		http.Redirect(w, req, "/login/", http.StatusSeeOther)
 		return
 	}
+
+	if !user.CheckPassword(password) {
+		session.AddFlash("invalid_credentials", "login")
+		_ = session.Save(req, w)
+
+		http.Redirect(w, req, "/login/", http.StatusSeeOther)
+		return
+	}
+
 	session.Values["authenticated"] = true
 	if err := session.Save(req, w); err != nil {
 		fmt.Printf("session save error: %v", err)
@@ -103,7 +102,6 @@ func (ttts *TicTacToeServer) HandleAccessControl(w http.ResponseWriter, req *htt
 		return
 	}
 	http.Redirect(w, req, "/adminpage/", http.StatusSeeOther)
-	return
 }
 
 func (ttts *TicTacToeServer) HandleAdminView(w http.ResponseWriter, req *http.Request) {

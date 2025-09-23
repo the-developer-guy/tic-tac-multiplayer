@@ -7,16 +7,20 @@ import (
 	"sync"
 
 	"github.com/the-developer-guy/tic-tac-multiplayer/internal"
+	"github.com/the-developer-guy/tic-tac-multiplayer/internal/auth"
 )
 
 type TicTacToeServer struct {
+	settings    *internal.AppConfig
 	Lobbies     map[string]*Lobby
 	lobbiesLock sync.Mutex
+	auth        auth.UserAuth
 }
 
 func NewTicTacToeServer(ac *internal.AppConfig) *TicTacToeServer {
 	ttts := TicTacToeServer{
-		Lobbies: make(map[string]*Lobby),
+		settings: ac,
+		Lobbies:  make(map[string]*Lobby),
 	}
 	return &ttts
 }
