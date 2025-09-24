@@ -30,6 +30,16 @@ flowchart TD
 - Scheduled: the server has a game lobby ready for both players. Match starts at a predefined time. Clients should only call `Get grid` periodically to get the state of the lobby.
 - In-game: the lobby is open, the game is on! Call the `Get grid` to get the state (mark positions, if it's your turn). If it's your turn, a single `Place` call places the player's mark. Call `Get grid` to get the result. If the game finished, both players go back to the `Idle` state.
 
+### Game arena
+
+The coordinates follow the Cartesian coordinate system, and addressed as indexes: bottom-left 0;0, top right 2;2
+
+| Cooord |         |         |
+| ------- | ------- | ------- |
+| X:0 Y:2 | X:1 Y:2 | X:2 Y:2 |
+| X:0 Y:1 | X:1 Y:1 | X:2 Y:1 |
+| X:0 Y:0 | X:1 Y:0 | X:2 Y:0 |
+
 ## API
 
 ### Get player information
