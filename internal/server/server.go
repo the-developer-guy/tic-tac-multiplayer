@@ -8,11 +8,12 @@ import (
 
 	"github.com/the-developer-guy/tic-tac-multiplayer/internal"
 	"github.com/the-developer-guy/tic-tac-multiplayer/internal/auth"
+	"github.com/the-developer-guy/tic-tac-multiplayer/internal/game"
 )
 
 type TicTacToeServer struct {
 	settings    *internal.AppConfig
-	Lobbies     map[string]*Lobby
+	Lobbies     map[string]*game.Lobby
 	lobbiesLock sync.Mutex
 	auth        *auth.UserAuth
 }
@@ -20,7 +21,7 @@ type TicTacToeServer struct {
 func NewTicTacToeServer(ac *internal.AppConfig) *TicTacToeServer {
 	ttts := TicTacToeServer{
 		settings: ac,
-		Lobbies:  make(map[string]*Lobby),
+		Lobbies:  make(map[string]*game.Lobby),
 		auth:     auth.NewUserAuth(),
 	}
 	ttts.auth.AddUser(ac.AdminUser, ac.AdminPassword)
@@ -50,14 +51,14 @@ func (ttts *TicTacToeServer) RegisterAdminHandles() {
 	http.HandleFunc("POST /handleplayeraccess/", ttts.HandleEditPlayerPermissions)
 }
 
-func (ttts *TicTacToeServer) AddLobby(lobby *Lobby) {
+func (ttts *TicTacToeServer) AddLobby(lobby *game.Lobby) {
 	ttts.lobbiesLock.Lock()
 	// TODO add check if lobby ID exists
 	ttts.Lobbies[lobby.LobbyID] = lobby
 	ttts.lobbiesLock.Unlock()
 }
 
-func (ttts *TicTacToeServer) GetLobby(lobbyId string) (*Lobby, error) {
+func (ttts *TicTacToeServer) GetLobby(lobbyId string) (*game.Lobby, error) {
 	l, ok := ttts.Lobbies[lobbyId]
 	if !ok {
 		return nil, fmt.Errorf("no lobby ID %s", lobbyId)

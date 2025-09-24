@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+
+	"github.com/the-developer-guy/tic-tac-multiplayer/internal/game"
 )
 
 func (ttts *TicTacToeServer) HandlePlayerInfo(w http.ResponseWriter, r *http.Request) {
@@ -54,7 +56,7 @@ func (ttts *TicTacToeServer) HandleGetGameGrid(w http.ResponseWriter, r *http.Re
 	fmt.Println("handling game arena getter")
 
 	if ttts.settings.Standalone {
-		placeholder := ttts.GenerateGrid()
+		placeholder := game.NewTicTacToeGrid()
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(placeholder)
 		return
@@ -71,7 +73,7 @@ func (ttts *TicTacToeServer) HandleGetGameGrid(w http.ResponseWriter, r *http.Re
 		return
 	}
 
-	placeholder := ttts.GenerateGrid()
+	placeholder := game.NewTicTacToeGrid()
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(placeholder)
 }
