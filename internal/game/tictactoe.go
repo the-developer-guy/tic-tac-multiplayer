@@ -8,12 +8,18 @@ type TicTacToeMark struct {
 }
 
 type TicTacToeGrid struct {
+	Field  [3][3]Mark
 	XMarks []TicTacToeMark `json:"x"`
 	OMarks []TicTacToeMark `json:"o"`
 }
 
 func NewTicTacToeGrid() *TicTacToeGrid {
 	tttg := TicTacToeGrid{
+		Field: [3][3]Mark{
+			{MarkEmpty, MarkEmpty, MarkEmpty},
+			{MarkEmpty, MarkEmpty, MarkEmpty},
+			{MarkEmpty, MarkEmpty, MarkEmpty},
+		},
 		XMarks: []TicTacToeMark{},
 		OMarks: []TicTacToeMark{},
 	}

@@ -1,6 +1,7 @@
 package game
 
 import (
+	"errors"
 	"sync"
 
 	"github.com/google/uuid"
@@ -9,12 +10,15 @@ import (
 type Mark int
 
 const (
-	MarkX Mark = iota
+	MarkEmpty Mark = iota
+	MarkX
 	MarkO
 )
 
 func (m Mark) String() string {
 	switch m {
+	case MarkEmpty:
+		return ""
 	case MarkX:
 		return "X"
 	case MarkO:
@@ -47,4 +51,8 @@ func NewLobby(token1 string, token2 string) *Lobby {
 		LobbyID: uuid.NewString(),
 		Grid:    NewTicTacToeGrid(),
 	}
+}
+
+func (l *Lobby) PlaceMark(token string, x, y int) error {
+	return errors.New("not implemented")
 }
