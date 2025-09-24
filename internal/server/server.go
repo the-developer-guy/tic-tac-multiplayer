@@ -11,55 +11,55 @@ import (
 	"github.com/the-developer-guy/tic-tac-multiplayer/internal/game"
 )
 
-type TicTacToeServer struct {
+type GameServer struct {
 	settings    *internal.AppConfig
 	Lobbies     map[string]*game.Lobby
 	lobbiesLock sync.Mutex
 	auth        *auth.UserAuth
 }
 
-func NewTicTacToeServer(ac *internal.AppConfig) *TicTacToeServer {
-	ttts := TicTacToeServer{
+func NewGameServer(ac *internal.AppConfig) *GameServer {
+	gs := GameServer{
 		settings: ac,
 		Lobbies:  make(map[string]*game.Lobby),
 		auth:     auth.NewUserAuth(),
 	}
-	ttts.auth.AddUser(ac.AdminUser, ac.AdminPassword)
+	gs.auth.AddUser(ac.AdminUser, ac.AdminPassword)
 
-	return &ttts
+	return &gs
 }
 
-func (ttts *TicTacToeServer) RegisterApiHandles() {
-	http.HandleFunc("GET /playerinfo/{playerId}/", ttts.HandlePlayerInfo)
-	http.HandleFunc("GET /ready/{playerId}/", ttts.HandleReadyPlayer)
+func (gs *GameServer) RegisterApiHandles() {
+	http.HandleFunc("GET /playerinfo/{playerId}/", gs.HandlePlayerInfo)
+	http.HandleFunc("GET /ready/{playerId}/", gs.HandleReadyPlayer)
 
-	http.HandleFunc("GET /getgrid/{lobbyId}/", ttts.HandleGetGameGrid)
-	http.HandleFunc("POST /place/{lobbyId}/", ttts.HandlePlaceMark)
-	http.HandleFunc("GET /getscores/", ttts.HandleFetchPlayerScores)
-	http.HandleFunc("GET /scores/", ttts.HandleScoresView)
+	http.HandleFunc("GET /getgrid/{lobbyId}/", gs.HandleGetGameGrid)
+	http.HandleFunc("POST /place/{lobbyId}/", gs.HandlePlaceMark)
+	http.HandleFunc("GET /getscores/", gs.HandleFetchPlayerScores)
+	http.HandleFunc("GET /scores/", gs.HandleScoresView)
 }
 
-func (ttts *TicTacToeServer) RegisterAdminHandles() {
-	http.HandleFunc("GET /admin/players/", ttts.HandleAdminListPlayers)
+func (gs *GameServer) RegisterAdminHandles() {
+	http.HandleFunc("GET /admin/players/", gs.HandleAdminListPlayers)
 
-	http.HandleFunc("/login/", ttts.HandleLoginView)
-	http.HandleFunc("POST /accessc", ttts.HandleAccessControl)
-	http.HandleFunc("/adminpage/", ttts.HandleAdminView)
-	http.HandleFunc("/fetchdata/", ttts.HandleGetData)
-	http.HandleFunc("POST /manualnewplayer/", ttts.HandleNewPlayer)
-	http.HandleFunc("POST /regeneratetoken/", ttts.HandleRegenerateToken)
-	http.HandleFunc("POST /handleplayeraccess/", ttts.HandleEditPlayerPermissions)
+	http.HandleFunc("/login/", gs.HandleLoginView)
+	http.HandleFunc("POST /accessc", gs.HandleAccessControl)
+	http.HandleFunc("/adminpage/", gs.HandleAdminView)
+	http.HandleFunc("/fetchdata/", gs.HandleGetData)
+	http.HandleFunc("POST /manualnewplayer/", gs.HandleNewPlayer)
+	http.HandleFunc("POST /regeneratetoken/", gs.HandleRegenerateToken)
+	http.HandleFunc("POST /handleplayeraccess/", gs.HandleEditPlayerPermissions)
 }
 
-func (ttts *TicTacToeServer) AddLobby(lobby *game.Lobby) {
-	ttts.lobbiesLock.Lock()
+func (gs *GameServer) AddLobby(lobby *game.Lobby) {
+	gs.lobbiesLock.Lock()
 	// TODO add check if lobby ID exists
-	ttts.Lobbies[lobby.LobbyID] = lobby
-	ttts.lobbiesLock.Unlock()
+	gs.Lobbies[lobby.LobbyID] = lobby
+	gs.lobbiesLock.Unlock()
 }
 
-func (ttts *TicTacToeServer) GetLobby(lobbyId string) (*game.Lobby, error) {
-	l, ok := ttts.Lobbies[lobbyId]
+func (gs *GameServer) GetLobby(lobbyId string) (*game.Lobby, error) {
+	l, ok := gs.Lobbies[lobbyId]
 	if !ok {
 		return nil, fmt.Errorf("no lobby ID %s", lobbyId)
 	}
@@ -67,10 +67,10 @@ func (ttts *TicTacToeServer) GetLobby(lobbyId string) (*game.Lobby, error) {
 	return l, nil
 }
 
-func (ttts *TicTacToeServer) Json() ([]byte, error) {
-	ttts.lobbiesLock.Lock()
-	payload, err := json.Marshal(ttts.Lobbies)
-	ttts.lobbiesLock.Unlock()
+func (gs *GameServer) Json() ([]byte, error) {
+	gs.lobbiesLock.Lock()
+	payload, err := json.Marshal(gs.Lobbies)
+	gs.lobbiesLock.Unlock()
 
 	return payload, err
 }

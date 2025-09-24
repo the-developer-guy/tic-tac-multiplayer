@@ -9,7 +9,7 @@ import (
 	"github.com/the-developer-guy/tic-tac-multiplayer/internal/game"
 )
 
-func (ttts *TicTacToeServer) HandlePlayerInfo(w http.ResponseWriter, r *http.Request) {
+func (gs *GameServer) HandlePlayerInfo(w http.ResponseWriter, r *http.Request) {
 
 	playerId := r.PathValue("playerId")
 	if playerId == "" {
@@ -23,9 +23,9 @@ func (ttts *TicTacToeServer) HandlePlayerInfo(w http.ResponseWriter, r *http.Req
 	w.Write([]byte(placeholder))
 }
 
-func (ttts *TicTacToeServer) HandleReadyPlayer(w http.ResponseWriter, r *http.Request) {
+func (gs *GameServer) HandleReadyPlayer(w http.ResponseWriter, r *http.Request) {
 
-	if ttts.settings.Standalone {
+	if gs.settings.Standalone {
 		placeholder := "{\"lobbyId\": \"0\", \"nextGame\": 0}"
 
 		w.Header().Set("Content-Type", "application/json")
@@ -52,10 +52,10 @@ func (ttts *TicTacToeServer) HandleReadyPlayer(w http.ResponseWriter, r *http.Re
 	w.Write([]byte(placeholder))
 }
 
-func (ttts *TicTacToeServer) HandleGetGameGrid(w http.ResponseWriter, r *http.Request) {
+func (gs *GameServer) HandleGetGameGrid(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("handling game arena getter")
 
-	if ttts.settings.Standalone {
+	if gs.settings.Standalone {
 		placeholder := game.NewTicTacToeGrid()
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(placeholder)
@@ -67,7 +67,7 @@ func (ttts *TicTacToeServer) HandleGetGameGrid(w http.ResponseWriter, r *http.Re
 		http.Error(w, "Missing lobby ID", http.StatusBadRequest)
 		return
 	}
-	_, err := ttts.GetLobby(lobbyId)
+	_, err := gs.GetLobby(lobbyId)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Nonexistent lobby ID %s", lobbyId), http.StatusBadRequest)
 		return
@@ -78,10 +78,10 @@ func (ttts *TicTacToeServer) HandleGetGameGrid(w http.ResponseWriter, r *http.Re
 	json.NewEncoder(w).Encode(placeholder)
 }
 
-func (ttts *TicTacToeServer) HandlePlaceMark(w http.ResponseWriter, r *http.Request) {
+func (gs *GameServer) HandlePlaceMark(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("handling mark placement from player")
 
-	if ttts.settings.Standalone {
+	if gs.settings.Standalone {
 		r.ParseForm()
 		token := r.Form.Get("token")
 		corX := r.Form.Get("cor_x")
@@ -98,7 +98,7 @@ func (ttts *TicTacToeServer) HandlePlaceMark(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	lobby, err := ttts.GetLobby(lobbyId)
+	lobby, err := gs.GetLobby(lobbyId)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("no lobby with ID %s found", lobbyId), http.StatusInternalServerError)
 	}

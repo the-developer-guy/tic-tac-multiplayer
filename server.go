@@ -14,7 +14,7 @@ func main() {
 		panic(err.Error())
 	}
 
-	s := server.NewTicTacToeServer(config)
+	s := server.NewGameServer(config)
 	s.RegisterApiHandles()
 	s.RegisterAdminHandles()
 
