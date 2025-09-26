@@ -5,11 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
 </head>
+    <script>
+        function importrecords() {
+            const xhttp = new XMLHttpRequest;
+            xhttp.open("POST", "/recordstodb/", true) 
+            xhttp.send();
+        }
+    </script>
 <body>
     <h1>Hola</h1>
      <form enctype="multipart/form-data" action="#" method="POST">
       <input type="file" name="recordFile" />
       <input type="submit" value="upload" />
     </form>
+    <button onclick="importrecords()">Import records to DB</button>
 </body>
 </html>

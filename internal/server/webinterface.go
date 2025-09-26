@@ -230,6 +230,18 @@ func HandleFileUpload(w http.ResponseWriter, req *http.Request) {
 	}
 
 	updated, err := ParseJsonFile()
+	if err != nil {
+		fmt.Println(err)
+	}
 	dataStore.data = updated
 
+}
+
+func (ttts *TicTacToeServer) ImportRecordsToDBHandler(w http.ResponseWriter, req *http.Request) {
+	if err := CheckSession(w, req); err != nil {
+		return
+	}
+
+	fmt.Println("Not implemented")
+	//TODO: Add functionality when DB is attached
 }
