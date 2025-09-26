@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"html/template"
+	"io"
 	"net/http"
 	"os"
 
@@ -184,4 +185,51 @@ func (ttts *TicTacToeServer) HandleFetchPlayerScores(w http.ResponseWriter, req 
 func (ttts *TicTacToeServer) HandleScoresView(w http.ResponseWriter, req *http.Request) {
 	t, _ := template.ParseFiles("./templates/scores.html")
 	t.Execute(w, nil)
+}
+
+func (ttts *TicTacToeServer) HandleImportPlayerView(w http.ResponseWriter, req *http.Request) {
+	if err := CheckSession(w, req); err != nil {
+		return
+	}
+
+	switch req.Method {
+
+	case "GET":
+		t, _ := template.ParseFiles("./templates/importplayers.html")
+		t.Execute(w, nil)
+	case "POST":
+		HandleFileUpload(w, req)
+	default:
+		http.Error(w, "Method not Allowed", http.StatusMethodNotAllowed)
+		return
+	}
+}
+
+func HandleFileUpload(w http.ResponseWriter, req *http.Request) {
+	req.ParseMultipartForm(200)
+
+	file, _, err := req.FormFile("recordFile")
+	if err != nil {
+		http.Error(w, "Bad Request", http.StatusBadRequest)
+		return
+	}
+	defer file.Close()
+	filePath := "./records.json"
+
+	outFile, err := os.Create(filePath)
+	if err != nil {
+		http.Error(w, "Unable to create file", http.StatusInternalServerError)
+		return
+	}
+	defer outFile.Close()
+
+	_, err = io.Copy(outFile, file)
+	if err != nil {
+		http.Error(w, "Unable to save file", http.StatusInternalServerError)
+		return
+	}
+
+	updated, err := ParseJsonFile()
+	dataStore.data = updated
+
 }

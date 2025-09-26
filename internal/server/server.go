@@ -66,6 +66,7 @@ func (ttts *TicTacToeServer) RegisterAdminHandles() {
 	http.HandleFunc("POST /manualnewplayer/", ttts.HandleNewPlayer)
 	http.HandleFunc("POST /regeneratetoken/", ttts.HandleRegenerateToken)
 	http.HandleFunc("POST /handleplayeraccess/", ttts.HandleEditPlayerPermissions)
+	http.HandleFunc("/playerimport/", ttts.HandleImportPlayerView)
 }
 
 func (ttts *TicTacToeServer) AddLobby(lobby *Lobby) {
