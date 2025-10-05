@@ -1,7 +1,7 @@
 package game
 
 import (
-	"errors"
+	"fmt"
 	"sync"
 
 	"github.com/google/uuid"
@@ -29,8 +29,8 @@ func (m Mark) String() string {
 }
 
 type Lobby struct {
-	PlayerAMark string `json:"playerAMark"`
-	PlayerBMark string `json:"playerBMark"`
+	PlayerAMark string `json:"playerAMark"` // Mark O by default
+	PlayerBMark string `json:"playerBMark"` // Mark X by default
 
 	PlayerAToken string `json:"playerAToken"`
 	PlayerBToken string `json:"playerBToken"`
@@ -54,5 +54,20 @@ func NewLobby(token1 string, token2 string) *Lobby {
 }
 
 func (l *Lobby) PlaceMark(x, y int, token string) error {
-	return errors.New("not implemented")
+	switch token {
+	case l.PlayerAToken:
+		err := l.Grid.PlaceMark(x, y, MarkO)
+		if err != nil {
+			return err
+		}
+	case l.PlayerBToken:
+		err := l.Grid.PlaceMark(x, y, MarkX)
+		if err != nil {
+			return err
+		}
+	default:
+		return fmt.Errorf("wrong token for lobby %s", l.LobbyID)
+	}
+
+	return nil
 }
