@@ -1,7 +1,6 @@
 package server
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -85,27 +84,24 @@ func (gs *GameServer) HandleReadyPlayer(w http.ResponseWriter, r *http.Request) 
 func (gs *GameServer) HandleGetGameGrid(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("handling game arena getter")
 
-	if gs.settings.LocalTest {
-		placeholder := game.NewTicTacToeGrid()
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(placeholder)
-		return
-	}
-
 	lobbyId := r.PathValue("lobbyId")
 	if lobbyId == "" {
 		http.Error(w, "Missing lobby ID", http.StatusBadRequest)
 		return
 	}
-	_, err := gs.GetLobby(lobbyId)
+	lobby, err := gs.GetLobby(lobbyId)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Nonexistent lobby ID %s", lobbyId), http.StatusBadRequest)
 		return
 	}
 
-	placeholder := game.NewTicTacToeGrid()
+	j, err := lobby.GridJson()
+	if err != nil {
+		http.Error(w, "failed to parse game arena", http.StatusInternalServerError)
+		return
+	}
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(placeholder)
+	w.Write(j)
 }
 
 func (gs *GameServer) HandlePlaceMark(w http.ResponseWriter, r *http.Request) {

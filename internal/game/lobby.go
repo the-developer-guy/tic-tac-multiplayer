@@ -1,6 +1,7 @@
 package game
 
 import (
+	"encoding/json"
 	"fmt"
 	"sync"
 	"time"
@@ -87,4 +88,15 @@ func (l *Lobby) ScheduleJson() []byte {
 	jsonString := fmt.Sprintf("{\"lobbyId\": \"%s\", \"nextGame\": %d}", l.LobbyID, l.StartTime.UnixMilli())
 
 	return []byte(jsonString)
+}
+
+func (l *Lobby) GridJson() ([]byte, error) {
+	l.lock.Lock()
+	j, err := json.Marshal(l.Grid)
+	l.lock.Unlock()
+	if err != nil {
+		return nil, err
+	}
+
+	return j, nil
 }
