@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/the-developer-guy/tic-tac-multiplayer/internal/auth"
 	"github.com/the-developer-guy/tic-tac-multiplayer/internal/game"
@@ -50,23 +51,35 @@ func (gs *GameServer) HandleReadyPlayer(w http.ResponseWriter, r *http.Request) 
 			p := auth.NewPlayer("test", token)
 			gs.players.AddPlayer(playerId, p)
 		}
+
+		l := game.NewLobby(token, "server", time.Now())
+		gs.AddLobby(l)
+
 	} else {
 		_, err := gs.players.GetAuthenticatedPlayer(playerId, token)
 		if err != nil {
 			http.Error(w, "Invalid credentials", http.StatusUnauthorized)
 			return
 		}
+
+		gs.AddReadyPlayer(playerId)
 	}
 
-	if gs.settings.LocalTest {
-		l := game.NewLobby(token, "server")
-		gs.AddLobby(l)
+	lobby, err := gs.GetReadyLobby(playerId)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
-	placeholder := "{\"lobbyId\": \"\", \"nextGame\": 0}"
+	if lobby == nil {
+		// not scheduled
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte("{}"))
+		return
+	}
 
 	w.Header().Set("Content-Type", "application/json")
-	w.Write([]byte(placeholder))
+	w.Write(lobby.ScheduleJson())
 }
 
 func (gs *GameServer) HandleGetGameGrid(w http.ResponseWriter, r *http.Request) {

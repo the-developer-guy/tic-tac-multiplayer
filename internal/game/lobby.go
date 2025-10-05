@@ -78,3 +78,9 @@ func (l *Lobby) PlaceMark(x, y int, token string) error {
 
 	return nil
 }
+
+func (l *Lobby) ScheduleJson() []byte {
+	jsonString := fmt.Sprintf("{\"lobbyId\": \"%s\", \"nextGame\": %d}", l.LobbyID, l.StartTime.UnixMilli())
+
+	return []byte(jsonString)
+}
