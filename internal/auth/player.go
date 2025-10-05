@@ -15,3 +15,19 @@ type Player struct {
 	DateOfRegister time.Time     `json:"dateOfRegister"`
 	Scores         *PlayerScores `json:"scores"`
 }
+
+func NewPlayer(name, token string) *Player {
+	p := Player{
+		Name:           name,
+		Token:          token,
+		BanTimestamp:   nil,
+		DateOfRegister: time.Now(),
+		Scores: &PlayerScores{
+			WinCount:  0,
+			LoseCount: 0,
+			TieCount:  0,
+		},
+	}
+
+	return &p
+}
