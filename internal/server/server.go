@@ -26,6 +26,11 @@ func NewGameServer(ac *internal.AppConfig) *GameServer {
 	}
 	gs.auth.AddUser(ac.AdminUser, ac.AdminPassword)
 
+	if ac.LocalTest {
+		l := game.NewLobby("test", "server")
+		gs.AddLobby(l)
+	}
+
 	return &gs
 }
 
@@ -51,11 +56,17 @@ func (gs *GameServer) RegisterAdminHandles() {
 	http.HandleFunc("POST /handleplayeraccess/", gs.HandleEditPlayerPermissions)
 }
 
-func (gs *GameServer) AddLobby(lobby *game.Lobby) {
+func (gs *GameServer) AddLobby(lobby *game.Lobby) error {
+	_, lobbyExists := gs.Lobbies[lobby.LobbyID]
+	if lobbyExists {
+		return fmt.Errorf("lobby ID %s already exists", lobby.LobbyID)
+	}
+
 	gs.lobbiesLock.Lock()
-	// TODO add check if lobby ID exists
 	gs.Lobbies[lobby.LobbyID] = lobby
 	gs.lobbiesLock.Unlock()
+
+	return nil
 }
 
 func (gs *GameServer) GetLobby(lobbyId string) (*game.Lobby, error) {
