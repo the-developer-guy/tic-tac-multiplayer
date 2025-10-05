@@ -25,14 +25,6 @@ func (gs *GameServer) HandlePlayerInfo(w http.ResponseWriter, r *http.Request) {
 
 func (gs *GameServer) HandleReadyPlayer(w http.ResponseWriter, r *http.Request) {
 
-	if gs.settings.LocalTest {
-		placeholder := "{\"lobbyId\": \"0\", \"nextGame\": 0}"
-
-		w.Header().Set("Content-Type", "application/json")
-		w.Write([]byte(placeholder))
-		return
-	}
-
 	playerId := r.PathValue("playerId")
 	if playerId == "" {
 		http.Error(w, "Missing player ID", http.StatusBadRequest)
@@ -44,6 +36,11 @@ func (gs *GameServer) HandleReadyPlayer(w http.ResponseWriter, r *http.Request) 
 	if token == "" {
 		http.Error(w, "Missing token", http.StatusBadRequest)
 		return
+	}
+
+	if gs.settings.LocalTest {
+		l := game.NewLobby(token, "server")
+		gs.AddLobby(l)
 	}
 
 	placeholder := "{\"lobbyId\": \"\", \"nextGame\": 0}"

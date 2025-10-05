@@ -8,7 +8,7 @@ import (
 
 	"github.com/gorilla/securecookie"
 	"github.com/gorilla/sessions"
-	"github.com/the-developer-guy/tic-tac-multiplayer/internal/game"
+	"github.com/the-developer-guy/tic-tac-multiplayer/internal/auth"
 )
 
 var (
@@ -23,7 +23,7 @@ var (
 
 type FetchScores struct {
 	Name  string            `json:"name"`
-	Score game.PlayerScores `json:"scores"`
+	Score auth.PlayerScores `json:"scores"`
 }
 
 type LoginStruct struct {
