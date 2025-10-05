@@ -53,6 +53,6 @@ func NewLobby(token1 string, token2 string) *Lobby {
 	}
 }
 
-func (l *Lobby) PlaceMark(token string, x, y int) error {
+func (l *Lobby) PlaceMark(x, y int, token string) error {
 	return errors.New("not implemented")
 }

@@ -27,7 +27,7 @@
                 "TTTSERVER_ADMIN_USER": "admin",
 		        "TTTSERVER_ADMIN_PASS": "pass",
 		        "TTTSERVER_ADMIN_TOKEN": "token",
-                "TTTSERVER_STANDALONE": "standalone"
+                "TTTSERVER_LOCAL_TEST": "test"
             }
         }
     ]

@@ -10,7 +10,7 @@ type AppConfig struct {
 	AdminUser     string
 	AdminPassword string
 	AdminToken    string
-	Standalone    bool
+	LocalTest     bool
 }
 
 func LoadConfig() (*AppConfig, error) {
@@ -19,13 +19,13 @@ func LoadConfig() (*AppConfig, error) {
 		AdminUser:     os.Getenv("TTTSERVER_ADMIN_USER"),
 		AdminPassword: os.Getenv("TTTSERVER_ADMIN_PASS"),
 		AdminToken:    os.Getenv("TTTSERVER_ADMIN_TOKEN"),
-		Standalone:    false,
+		LocalTest:     false,
 	}
 
-	standalone := os.Getenv("TTTSERVER_STANDALONE")
-	if standalone != "" {
-		ac.Standalone = true
-		fmt.Println("Standalone mode set")
+	lt := os.Getenv("TTTSERVER_LOCAL_TEST")
+	if lt != "" {
+		ac.LocalTest = true
+		fmt.Println("Loopback/test mode set")
 	}
 
 	if ac.AdminUser == "" {
