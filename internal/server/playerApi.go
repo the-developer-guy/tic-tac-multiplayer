@@ -163,5 +163,9 @@ func (gs *GameServer) HandlePlaceMark(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if gs.settings.LocalTest {
+		lobby.Grid.PlaceRandomMark(game.MarkO)
+	}
+
 	// TODO status 200
 }
