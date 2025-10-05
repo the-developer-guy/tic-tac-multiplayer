@@ -3,6 +3,7 @@ package game
 import (
 	"fmt"
 	"sync"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -38,10 +39,12 @@ type Lobby struct {
 	LobbyID string         `json:"lobbyID"`
 	Grid    *TicTacToeGrid `json:"gameGrid"`
 	lock    sync.Mutex     // TODO add access methods to Lobby
+
+	StartTime time.Time
 }
 
-func NewLobby(token1 string, token2 string) *Lobby {
-	return &Lobby{
+func NewLobby(token1 string, token2 string, scheduledStart time.Time) *Lobby {
+	l := Lobby{
 		PlayerAMark: MarkX.String(),
 		PlayerBMark: MarkO.String(),
 
@@ -50,7 +53,11 @@ func NewLobby(token1 string, token2 string) *Lobby {
 
 		LobbyID: uuid.NewString(),
 		Grid:    NewTicTacToeGrid(),
+
+		StartTime: scheduledStart,
 	}
+
+	return &l
 }
 
 func (l *Lobby) PlaceMark(x, y int, token string) error {
