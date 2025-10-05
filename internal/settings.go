@@ -24,8 +24,21 @@ func LoadConfig() (*AppConfig, error) {
 
 	lt := os.Getenv("TTTSERVER_LOCAL_TEST")
 	if lt != "" {
-		ac.LocalTest = true
 		fmt.Println("Loopback/test mode set")
+
+		ac.LocalTest = true
+
+		if ac.AdminUser == "" {
+			ac.AdminUser = "admin"
+		}
+		if ac.AdminPassword == "" {
+			ac.AdminPassword = "admin"
+		}
+		if ac.AdminToken == "" {
+			ac.AdminToken = "admin"
+		}
+
+		return &ac, nil
 	}
 
 	if ac.AdminUser == "" {
