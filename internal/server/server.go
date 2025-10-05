@@ -18,7 +18,7 @@ type GameServer struct {
 	TournamentLobbies       map[string]*game.Lobby
 	ActiveTournamentLobbies map[string]*game.Lobby
 	ScheduledLobbies        map[string]*game.Lobby
-	ReadyPlayers            []string
+	ReadyPlayerIDs          []int64
 	lobbiesLock             sync.Mutex
 	playersLock             sync.Mutex
 	auth                    *auth.UserAuth
@@ -93,18 +93,18 @@ func (gs *GameServer) GetLobby(lobbyId string) (*game.Lobby, error) {
 	return l, nil
 }
 
-func (gs *GameServer) AddReadyPlayer(id string) error {
+func (gs *GameServer) AddReadyPlayer(id int64) error {
 	gs.playersLock.Lock()
 
-	playerIndex := slices.Index(gs.ReadyPlayers, id)
+	playerIndex := slices.Index(gs.ReadyPlayerIDs, id)
 	if playerIndex == -1 {
-		gs.ReadyPlayers = append(gs.ReadyPlayers, id)
+		gs.ReadyPlayerIDs = append(gs.ReadyPlayerIDs, id)
 	}
 
 	gs.playersLock.Unlock()
 
 	if playerIndex != -1 {
-		return fmt.Errorf("player ID %s already scheduled for a match", id)
+		return fmt.Errorf("player ID %d already scheduled for a match", id)
 	}
 
 	return nil

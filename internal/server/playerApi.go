@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/the-developer-guy/tic-tac-multiplayer/internal/auth"
 	"github.com/the-developer-guy/tic-tac-multiplayer/internal/game"
 )
 
@@ -25,9 +26,14 @@ func (gs *GameServer) HandlePlayerInfo(w http.ResponseWriter, r *http.Request) {
 
 func (gs *GameServer) HandleReadyPlayer(w http.ResponseWriter, r *http.Request) {
 
-	playerId := r.PathValue("playerId")
-	if playerId == "" {
+	pid := r.PathValue("playerId")
+	if pid == "" {
 		http.Error(w, "Missing player ID", http.StatusBadRequest)
+		return
+	}
+	playerId, err := strconv.ParseInt(pid, 10, 32)
+	if err != nil {
+		http.Error(w, "Invalid player ID", http.StatusBadRequest)
 		return
 	}
 
@@ -36,6 +42,20 @@ func (gs *GameServer) HandleReadyPlayer(w http.ResponseWriter, r *http.Request) 
 	if token == "" {
 		http.Error(w, "Missing token", http.StatusBadRequest)
 		return
+	}
+
+	if gs.settings.LocalTest {
+		_, err := gs.players.GetPlayer(playerId)
+		if err != nil {
+			p := auth.NewPlayer("test", token)
+			gs.players.AddPlayer(playerId, p)
+		}
+	} else {
+		_, err := gs.players.GetAuthenticatedPlayer(playerId, token)
+		if err != nil {
+			http.Error(w, "Invalid credentials", http.StatusUnauthorized)
+			return
+		}
 	}
 
 	if gs.settings.LocalTest {
