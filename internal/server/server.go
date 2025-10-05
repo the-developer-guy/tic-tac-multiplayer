@@ -93,6 +93,20 @@ func (gs *GameServer) GetLobby(lobbyId string) (*game.Lobby, error) {
 	return l, nil
 }
 
+func (gs *GameServer) GetReadyLobby(playerId int64) (*game.Lobby, error) {
+	gs.lobbiesLock.Lock()
+	var lobby *game.Lobby
+	for _, l := range gs.ActiveTournamentLobbies {
+		if playerId == l.PlayerAId || playerId == l.PlayerBId {
+			lobby = l
+			break
+		}
+	}
+	gs.lobbiesLock.Unlock()
+
+	return lobby, nil
+}
+
 func (gs *GameServer) AddReadyPlayer(id int64) error {
 	gs.playersLock.Lock()
 

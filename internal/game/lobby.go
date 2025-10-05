@@ -35,6 +35,8 @@ type Lobby struct {
 
 	PlayerAToken string `json:"playerAToken"`
 	PlayerBToken string `json:"playerBToken"`
+	PlayerAId    int64  `json:"playerAId"`
+	PlayerBId    int64  `json:"playerBId"`
 
 	LobbyID string         `json:"lobbyID"`
 	Grid    *TicTacToeGrid `json:"gameGrid"`
