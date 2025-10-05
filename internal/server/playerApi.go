@@ -124,7 +124,10 @@ func (gs *GameServer) HandlePlaceMark(w http.ResponseWriter, r *http.Request) {
 
 		if lobbyId == "" {
 			fmt.Println("Missing lobby ID!")
-			lobbyId = "0"
+			for lid := range gs.ActiveTournamentLobbies {
+				lobbyId = lid
+				break
+			}
 		}
 	} else {
 		if token == "" {
