@@ -52,7 +52,7 @@ func (gs *GameServer) HandleReadyPlayer(w http.ResponseWriter, r *http.Request) 
 			gs.players.AddPlayer(playerId, p)
 		}
 
-		l := game.NewLobby(token, "server", time.Now())
+		l := game.NewLobby(token, "", playerId, 0, time.Now())
 		gs.AddLobby(l)
 
 	} else {

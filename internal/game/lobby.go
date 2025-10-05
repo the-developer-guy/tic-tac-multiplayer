@@ -45,13 +45,15 @@ type Lobby struct {
 	StartTime time.Time
 }
 
-func NewLobby(token1 string, token2 string, scheduledStart time.Time) *Lobby {
+func NewLobby(token1, token2 string, id1, id2 int64, scheduledStart time.Time) *Lobby {
 	l := Lobby{
 		PlayerAMark: MarkX.String(),
 		PlayerBMark: MarkO.String(),
 
 		PlayerAToken: token1,
 		PlayerBToken: token2,
+		PlayerAId:    id1,
+		PlayerBId:    id2,
 
 		LobbyID: uuid.NewString(),
 		Grid:    NewTicTacToeGrid(),

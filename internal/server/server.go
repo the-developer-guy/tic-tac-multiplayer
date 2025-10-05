@@ -36,6 +36,11 @@ func NewGameServer(ac *internal.AppConfig) *GameServer {
 	}
 	gs.auth.AddUser(ac.AdminUser, ac.AdminPassword)
 
+	if gs.settings.LocalTest {
+		p := auth.NewPlayer("server", "")
+		gs.players.AddPlayer(0, p)
+	}
+
 	return &gs
 }
 
