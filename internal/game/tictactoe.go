@@ -33,6 +33,10 @@ func NewTicTacToeGrid() *TicTacToeGrid {
 
 func (tttg *TicTacToeGrid) PlaceMark(x, y int, mark Mark) error {
 
+	if x < 0 || y < 0 || x >= 3 || y >= 3 {
+		return fmt.Errorf("coordinate (%d;%d) out of range", x, y)
+	}
+
 	if tttg.Field[x][y] != MarkEmpty {
 		return fmt.Errorf("%d;%d position is already filled", x, y)
 	}
