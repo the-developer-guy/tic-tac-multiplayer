@@ -4,35 +4,43 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"maps"
+	"math/rand"
 	"net/http"
 	"slices"
 	"sync"
+	"time"
 
 	"github.com/the-developer-guy/tic-tac-multiplayer/internal"
 	"github.com/the-developer-guy/tic-tac-multiplayer/internal/auth"
 	"github.com/the-developer-guy/tic-tac-multiplayer/internal/game"
 )
 
+type ScheduledPlayer struct {
+	Player    *auth.Player
+	LobbyID   string
+	ReadyTime int64
+}
+
 type GameServer struct {
-	settings                *internal.AppConfig
-	TournamentLobbies       map[string]*game.Lobby
-	ActiveTournamentLobbies map[string]*game.Lobby
-	ScheduledLobbies        map[string]*game.Lobby
-	ReadyPlayerIDs          []int64
-	lobbiesLock             sync.Mutex
-	playersLock             sync.Mutex
-	auth                    *auth.UserAuth
-	players                 *auth.PlayerAuth
+	settings         *internal.AppConfig
+	Lobbies          map[string]*game.Lobby
+	ScheduledLobbies map[string]*game.Lobby
+	ReadyPlayers     map[int64]*ScheduledPlayer
+	lobbiesLock      sync.Mutex
+	playersLock      sync.Mutex
+	auth             *auth.UserAuth
+	players          *auth.PlayerAuth
 }
 
 func NewGameServer(ac *internal.AppConfig) *GameServer {
 	gs := GameServer{
-		settings:                ac,
-		TournamentLobbies:       make(map[string]*game.Lobby),
-		ActiveTournamentLobbies: make(map[string]*game.Lobby),
-		ScheduledLobbies:        make(map[string]*game.Lobby),
-		auth:                    auth.NewUserAuth(),
-		players:                 auth.NewPlayerAuth(),
+		settings:         ac,
+		Lobbies:          make(map[string]*game.Lobby),
+		ScheduledLobbies: make(map[string]*game.Lobby),
+		ReadyPlayers:     make(map[int64]*ScheduledPlayer),
+		auth:             auth.NewUserAuth(),
+		players:          auth.NewPlayerAuth(),
 	}
 	gs.auth.AddUser(ac.AdminUser, ac.AdminPassword)
 
@@ -71,26 +79,26 @@ func (gs *GameServer) ScheduleTournamentMatch(player1Token, player2Token string)
 }
 
 func (gs *GameServer) AddLobby(lobby *game.Lobby) error {
-	_, lobbyExists := gs.TournamentLobbies[lobby.LobbyID]
+	_, lobbyExists := gs.Lobbies[lobby.LobbyID]
 	if lobbyExists {
 		return fmt.Errorf("lobby ID %s already exists", lobby.LobbyID)
 	}
 
-	_, lobbyActive := gs.ActiveTournamentLobbies[lobby.LobbyID]
+	_, lobbyActive := gs.Lobbies[lobby.LobbyID]
 	if lobbyActive {
 		return fmt.Errorf("lobby ID %s already active", lobby.LobbyID)
 	}
 
 	gs.lobbiesLock.Lock()
-	gs.TournamentLobbies[lobby.LobbyID] = lobby
-	gs.ActiveTournamentLobbies[lobby.LobbyID] = lobby
+	gs.Lobbies[lobby.LobbyID] = lobby
+	gs.Lobbies[lobby.LobbyID] = lobby
 	gs.lobbiesLock.Unlock()
 
 	return nil
 }
 
 func (gs *GameServer) GetLobby(lobbyId string) (*game.Lobby, error) {
-	l, ok := gs.TournamentLobbies[lobbyId]
+	l, ok := gs.Lobbies[lobbyId]
 	if !ok {
 		return nil, fmt.Errorf("no lobby ID %s", lobbyId)
 	}
@@ -101,7 +109,7 @@ func (gs *GameServer) GetLobby(lobbyId string) (*game.Lobby, error) {
 func (gs *GameServer) GetReadyLobby(playerId int64) (*game.Lobby, error) {
 	gs.lobbiesLock.Lock()
 	var lobby *game.Lobby
-	for _, l := range gs.ActiveTournamentLobbies {
+	for _, l := range gs.Lobbies {
 		if playerId == l.PlayerAId || playerId == l.PlayerBId {
 			lobby = l
 			break
@@ -115,23 +123,69 @@ func (gs *GameServer) GetReadyLobby(playerId int64) (*game.Lobby, error) {
 func (gs *GameServer) AddReadyPlayer(id int64) error {
 	gs.playersLock.Lock()
 
-	playerIndex := slices.Index(gs.ReadyPlayerIDs, id)
-	if playerIndex == -1 {
-		gs.ReadyPlayerIDs = append(gs.ReadyPlayerIDs, id)
+	_, ok := gs.ReadyPlayers[id]
+
+	if !ok {
+		p, err := gs.players.GetPlayer(id)
+		if err != nil {
+			return err
+		}
+		gs.ReadyPlayers[id] = &ScheduledPlayer{
+			Player:    p,
+			ReadyTime: time.Now().UnixMilli(),
+		}
+
 	}
 
 	gs.playersLock.Unlock()
 
-	if playerIndex != -1 {
+	if ok {
 		return fmt.Errorf("player ID %d already scheduled for a match", id)
 	}
 
 	return nil
 }
 
+func (gs *GameServer) ScheduleGame() error {
+
+	gs.lobbiesLock.Lock()
+
+	ids := slices.Collect(maps.Keys(gs.ReadyPlayers))
+	if len(ids) < 2 {
+		return errors.New("not enough ready players to schedule")
+	} else if len(ids) < 4 {
+		return errors.New("not enough ready players to properly schedule")
+	}
+
+	playerAId := ids[rand.Intn(len(ids))]
+	playerBId := int64(0)
+	for playerBId == playerAId {
+		playerBId = ids[rand.Intn(len(ids))]
+	}
+
+	PlayerA, errA := gs.players.GetPlayer(playerAId)
+	if errA != nil {
+		return errA
+	}
+	PlayerB, errB := gs.players.GetPlayer(playerBId)
+	if errB != nil {
+		return errA
+	}
+
+	l := game.NewLobby(PlayerA.Token, PlayerB.Token, playerAId, playerBId, time.Now())
+	gs.AddLobby(l)
+
+	delete(gs.ReadyPlayers, playerAId)
+	delete(gs.ReadyPlayers, playerBId)
+
+	gs.lobbiesLock.Unlock()
+
+	return nil
+}
+
 func (gs *GameServer) Json() ([]byte, error) {
 	gs.lobbiesLock.Lock()
-	payload, err := json.Marshal(gs.TournamentLobbies)
+	payload, err := json.Marshal(gs.Lobbies)
 	gs.lobbiesLock.Unlock()
 
 	return payload, err

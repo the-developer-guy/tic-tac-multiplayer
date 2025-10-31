@@ -62,6 +62,13 @@ func (gs *GameServer) HandleReadyPlayer(w http.ResponseWriter, r *http.Request) 
 		}
 
 		gs.AddReadyPlayer(playerId)
+		err = gs.ScheduleGame()
+		if err != nil {
+			w.Header().Set("Content-Type", "application/json")
+			w.Write([]byte("{}"))
+			fmt.Println("Scheduling game failed")
+			return
+		}
 	}
 
 	lobby, err := gs.GetReadyLobby(playerId)
@@ -124,7 +131,7 @@ func (gs *GameServer) HandlePlaceMark(w http.ResponseWriter, r *http.Request) {
 
 		if lobbyId == "" {
 			fmt.Println("Missing lobby ID!")
-			for lid := range gs.ActiveTournamentLobbies {
+			for lid := range gs.Lobbies {
 				lobbyId = lid
 				break
 			}
