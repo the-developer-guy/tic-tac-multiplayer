@@ -1,18 +1,14 @@
 import network
 import random
+import time
 
 network = network.Network("http://localhost:8080/")
-board = [['' for _ in range(3)] for _ in range(3)]
 
-def move(mark, x,y):
-    board[y][x] = mark
-
-
-move("X", 2,0)
-print(board)
-
-network.InQueue()
-print(network.lobbyid)
-
-
-
+network.sendActivityRequest()
+while True:
+    print("Sent random mark")
+    network.sendRandomPlacement()
+    time.sleep(1)
+    network.getGrid()
+    print(network.currentField)
+    time.sleep(2)
