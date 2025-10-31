@@ -3,7 +3,7 @@ import json
 import time
 import random
 
-class Network:
+class GameConnection:
     def __init__(self, address):
         self.token = "asd123"
         self.id = "1"

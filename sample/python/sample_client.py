@@ -1,14 +1,14 @@
-import network
 import random
 import time
+from game_connection import GameConnection
 
-network = network.Network("http://localhost:8080/")
+connection = GameConnection("http://localhost:8080/")
 
-network.sendActivityRequest()
+connection.sendActivityRequest()
 while True:
     print("Sent random mark")
-    network.sendRandomPlacement()
+    connection.sendRandomPlacement()
     time.sleep(1)
-    network.getGrid()
-    print(network.currentField)
+    connection.getGrid()
+    print(connection.currentField)
     time.sleep(2)
