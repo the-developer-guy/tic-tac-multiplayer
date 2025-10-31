@@ -61,13 +61,24 @@ func (gs *GameServer) HandleReadyPlayer(w http.ResponseWriter, r *http.Request) 
 			return
 		}
 
-		gs.AddReadyPlayer(playerId)
-		err = gs.ScheduleGame()
-		if err != nil {
-			w.Header().Set("Content-Type", "application/json")
-			w.Write([]byte("{}"))
-			fmt.Println("Scheduling game failed")
-			return
+		playerScheduled := false
+		// if player already scheduled for a game, skip schedule
+		for _, lobby := range gs.ScheduledLobbies {
+			if lobby.PlayerAId == playerId || lobby.PlayerBId == playerId {
+				playerScheduled = true
+				break
+			}
+		}
+
+		if !playerScheduled {
+			gs.AddReadyPlayer(playerId)
+			err = gs.ScheduleGame()
+			if err != nil {
+				w.Header().Set("Content-Type", "application/json")
+				w.Write([]byte("{}"))
+				fmt.Println("Scheduling game failed")
+				return
+			}
 		}
 	}
 

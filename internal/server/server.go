@@ -84,14 +84,14 @@ func (gs *GameServer) AddLobby(lobby *game.Lobby) error {
 		return fmt.Errorf("lobby ID %s already exists", lobby.LobbyID)
 	}
 
-	_, lobbyActive := gs.Lobbies[lobby.LobbyID]
+	_, lobbyActive := gs.ScheduledLobbies[lobby.LobbyID]
 	if lobbyActive {
-		return fmt.Errorf("lobby ID %s already active", lobby.LobbyID)
+		return fmt.Errorf("lobby ID %s already scheduled", lobby.LobbyID)
 	}
 
 	gs.lobbiesLock.Lock()
 	gs.Lobbies[lobby.LobbyID] = lobby
-	gs.Lobbies[lobby.LobbyID] = lobby
+	gs.ScheduledLobbies[lobby.LobbyID] = lobby
 	gs.lobbiesLock.Unlock()
 
 	return nil
@@ -173,7 +173,6 @@ func (gs *GameServer) ScheduleGame() error {
 
 	l := game.NewLobby(PlayerA.Token, PlayerB.Token, playerAId, playerBId, time.Now())
 	gs.AddLobby(l)
-
 	delete(gs.ReadyPlayers, playerAId)
 	delete(gs.ReadyPlayers, playerBId)
 
