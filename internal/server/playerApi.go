@@ -38,7 +38,7 @@ func (gs *GameServer) HandleReadyPlayer(w http.ResponseWriter, r *http.Request) 
 	}
 
 	r.ParseForm()
-	token := r.Form.Get("token")
+	token := r.Header.Get("token")
 	if token == "" {
 		http.Error(w, "Missing token", http.StatusBadRequest)
 		return

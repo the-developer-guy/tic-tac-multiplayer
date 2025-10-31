@@ -13,7 +13,7 @@ class GameConnection:
         self.currentField = [[0,0,0], [0,0,0], [0,0,0]]
 
     def sendActivityRequest(self):
-        url = f"{self.address}ready/{self.id}/{self.token}"
+        url = f"{self.address}ready/{self.id}/"
         r = requests.get(url)
         if r.status_code != 200:
             print(r.text)

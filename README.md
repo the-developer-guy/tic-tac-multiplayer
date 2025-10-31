@@ -57,6 +57,8 @@ Returns the most important upcoming game info and player statistics.
 
 Signal the server, that the player is ready for a match, like a heartbeat. Authentication required.
 
+Authentication: add your `token` to the HTTP header.
+
 Recommended refresh period: 1-60s. Players idling for more than 60s will be marked as `inactive`.
 
 If the player is scheduled for a match, the response includes a timestamp and lobby ID.
