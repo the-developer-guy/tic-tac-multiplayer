@@ -18,7 +18,8 @@ func NewPlayerAuth() *PlayerAuth {
 }
 
 func (pa *PlayerAuth) AddPlayer(id int64, player *Player) error {
-	return errors.New("not implemented")
+	pa.players[id] = player
+	return nil
 }
 
 func (pa *PlayerAuth) LoadPlayers() error {
