@@ -128,6 +128,7 @@ func (gs *GameServer) AddReadyPlayer(id int64) error {
 	if !ok {
 		p, err := gs.players.GetPlayer(id)
 		if err != nil {
+			gs.playersLock.Unlock()
 			return err
 		}
 		gs.ReadyPlayers[id] = &ScheduledPlayer{
@@ -148,17 +149,15 @@ func (gs *GameServer) AddReadyPlayer(id int64) error {
 
 func (gs *GameServer) ScheduleGame() error {
 
-	gs.lobbiesLock.Lock()
-
 	ids := slices.Collect(maps.Keys(gs.ReadyPlayers))
 	if len(ids) < 2 {
 		return errors.New("not enough ready players to schedule")
-	} else if len(ids) < 4 {
-		return errors.New("not enough ready players to properly schedule")
-	}
+	} //else if len(ids) < 4 {
+	//return errors.New("not enough ready players to properly schedule")
+	//}
 
 	playerAId := ids[rand.Intn(len(ids))]
-	playerBId := int64(0)
+	playerBId := ids[rand.Intn(len(ids))]
 	for playerBId == playerAId {
 		playerBId = ids[rand.Intn(len(ids))]
 	}
@@ -177,8 +176,6 @@ func (gs *GameServer) ScheduleGame() error {
 
 	delete(gs.ReadyPlayers, playerAId)
 	delete(gs.ReadyPlayers, playerBId)
-
-	gs.lobbiesLock.Unlock()
 
 	return nil
 }
