@@ -5,30 +5,31 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/the-developer-guy/tic-tac-multiplayer/internal/auth"
 )
 
 type FetchedData struct {
-	data map[int]Player
+	data map[int]*auth.Player
 }
 
 // Constructor -> sample data
 func NewFetchedData() *FetchedData {
 	return &FetchedData{
-		data: map[int]Player{
-			1: {Name: "Lakatos Tivadar", Token: "123", BanTimestamp: nil, DateOfRegister: time.Now(), Scores: &PlayerScores{WinCount: 0, LoseCount: 0, TieCount: 0}},
-			2: {Name: "Zsoric Migmond", Token: "123asd", BanTimestamp: nil, DateOfRegister: time.Now(), Scores: &PlayerScores{WinCount: 0, LoseCount: 10, TieCount: 0}},
-			3: {Name: "Lakatos Tivadar", Token: "asd123", BanTimestamp: nil, DateOfRegister: time.Now(), Scores: &PlayerScores{WinCount: 0, LoseCount: 0, TieCount: 0}},
+		data: map[int]*auth.Player{
+			1: {Name: "Lakatos Tivadar", Token: "123", BanTimestamp: nil, DateOfRegister: time.Now(), Scores: &auth.PlayerScores{WinCount: 0, LoseCount: 0, TieCount: 0}},
+			2: {Name: "Zsoric Migmond", Token: "123asd", BanTimestamp: nil, DateOfRegister: time.Now(), Scores: &auth.PlayerScores{WinCount: 0, LoseCount: 10, TieCount: 0}},
+			3: {Name: "Lakatos Tivadar", Token: "asd123", BanTimestamp: nil, DateOfRegister: time.Now(), Scores: &auth.PlayerScores{WinCount: 0, LoseCount: 0, TieCount: 0}},
 		},
 	}
 }
 
-func (f *FetchedData) GetAllData() map[int]Player {
+func (f *FetchedData) GetAllData() map[int]*auth.Player {
 	return f.data
 }
 
-func (f *FetchedData) GetPlayerByID(id int) (*Player, error) {
+func (f *FetchedData) GetPlayerByID(id int) (*auth.Player, error) {
 	if player, ok := f.data[id]; ok {
-		return &player, nil
+		return player, nil
 	}
 	return nil, fmt.Errorf("Player is not found.")
 }
@@ -51,12 +52,12 @@ func (f *FetchedData) NewPlayer(name string) {
 	}
 	newID++
 
-	f.data[newID] = Player{
+	f.data[newID] = &auth.Player{
 		Name:           name,
 		Token:          uuid.NewString(),
 		BanTimestamp:   nil,
 		DateOfRegister: time.Now(),
-		Scores:         &PlayerScores{WinCount: 0, LoseCount: 0, TieCount: 0},
+		Scores:         &auth.PlayerScores{WinCount: 0, LoseCount: 0, TieCount: 0},
 	}
 }
 func (f *FetchedData) RegenerateToken(token string) (string, error) {

@@ -3,12 +3,18 @@ package main
 import (
 	"net/http"
 
+	"github.com/the-developer-guy/tic-tac-multiplayer/internal"
 	"github.com/the-developer-guy/tic-tac-multiplayer/internal/server"
 )
 
 func main() {
 
-	s := server.NewTicTacToeServer()
+	config, err := internal.LoadConfig()
+	if err != nil {
+		panic(err.Error())
+	}
+
+	s := server.NewGameServer(config)
 	s.RegisterApiHandles()
 	s.RegisterAdminHandles()
 

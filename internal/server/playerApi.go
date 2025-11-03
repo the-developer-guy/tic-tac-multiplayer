@@ -1,12 +1,16 @@
 package server
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
+	"time"
+
+	"github.com/the-developer-guy/tic-tac-multiplayer/internal/auth"
+	"github.com/the-developer-guy/tic-tac-multiplayer/internal/game"
 )
 
-func (ttts *TicTacToeServer) HandlePlayerInfo(w http.ResponseWriter, r *http.Request) {
+func (gs *GameServer) HandlePlayerInfo(w http.ResponseWriter, r *http.Request) {
 
 	playerId := r.PathValue("playerId")
 	if playerId == "" {
@@ -20,28 +24,82 @@ func (ttts *TicTacToeServer) HandlePlayerInfo(w http.ResponseWriter, r *http.Req
 	w.Write([]byte(placeholder))
 }
 
-func (ttts *TicTacToeServer) HandleReadyPlayer(w http.ResponseWriter, r *http.Request) {
+func (gs *GameServer) HandleReadyPlayer(w http.ResponseWriter, r *http.Request) {
 
-	playerId := r.PathValue("playerId")
-	if playerId == "" {
+	pid := r.PathValue("playerId")
+	if pid == "" {
 		http.Error(w, "Missing player ID", http.StatusBadRequest)
+		return
+	}
+	playerId, err := strconv.ParseInt(pid, 10, 32)
+	if err != nil {
+		http.Error(w, "Invalid player ID", http.StatusBadRequest)
 		return
 	}
 
 	r.ParseForm()
-	token := r.Form.Get("token")
+	token := r.Header.Get("token")
 	if token == "" {
 		http.Error(w, "Missing token", http.StatusBadRequest)
 		return
 	}
 
-	placeholder := "{\"lobbyId\": \"\", \"nextGame\": 0}"
+	if gs.settings.LocalTest {
+		_, err := gs.players.GetPlayer(playerId)
+		if err != nil {
+			p := auth.NewPlayer("test", token)
+			gs.players.AddPlayer(playerId, p)
+		}
+
+		l := game.NewLobby(token, "", playerId, 0, time.Now())
+		gs.AddLobby(l)
+
+	} else {
+		_, err := gs.players.GetAuthenticatedPlayer(playerId, token)
+		if err != nil {
+			http.Error(w, "Invalid credentials", http.StatusUnauthorized)
+			return
+		}
+
+		playerScheduled := false
+		// if player already scheduled for a game, skip schedule
+		for _, lobby := range gs.ScheduledLobbies {
+			if lobby.PlayerAId == playerId || lobby.PlayerBId == playerId {
+				playerScheduled = true
+				break
+			}
+		}
+
+		if !playerScheduled {
+			gs.AddReadyPlayer(playerId)
+			err = gs.ScheduleGame()
+			if err != nil {
+				w.Header().Set("Content-Type", "application/json")
+				w.Write([]byte("{}"))
+				fmt.Println("Scheduling game failed")
+				return
+			}
+		}
+	}
+
+	lobby, err := gs.GetReadyLobby(playerId)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if lobby == nil {
+		// not scheduled
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte("{}"))
+		return
+	}
 
 	w.Header().Set("Content-Type", "application/json")
-	w.Write([]byte(placeholder))
+	w.Write(lobby.ScheduleJson())
 }
 
-func (ttts *TicTacToeServer) HandleGetGameGrid(w http.ResponseWriter, r *http.Request) {
+func (gs *GameServer) HandleGetGameGrid(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("handling game arena getter")
 
 	lobbyId := r.PathValue("lobbyId")
@@ -49,32 +107,83 @@ func (ttts *TicTacToeServer) HandleGetGameGrid(w http.ResponseWriter, r *http.Re
 		http.Error(w, "Missing lobby ID", http.StatusBadRequest)
 		return
 	}
-	_, err := ttts.GetLobby(lobbyId)
+	lobby, err := gs.GetLobby(lobbyId)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Nonexistent lobby ID %s", lobbyId), http.StatusBadRequest)
 		return
 	}
 
-	placeholder := ttts.GenerateGrid()
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(placeholder)
-}
-
-func (ttts *TicTacToeServer) HandlePlaceMark(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("handling mark placement from player")
-
-	lobbyId := r.PathValue("lobbyId")
-	if lobbyId == "" {
-		http.Error(w, "Missing lobby ID", http.StatusBadRequest)
+	j, err := lobby.GridJson()
+	if err != nil {
+		http.Error(w, "failed to parse game arena", http.StatusInternalServerError)
 		return
 	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(j)
+}
+
+func (gs *GameServer) HandlePlaceMark(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("handling mark placement from player")
 
 	r.ParseForm()
 	token := r.Form.Get("token")
 	corX := r.Form.Get("cor_x")
 	corY := r.Form.Get("cor_y")
-	if token == "" || corX == "" || corY == "" {
-		http.Error(w, "Missing Arguments", http.StatusBadRequest)
+	lobbyId := r.PathValue("lobbyId")
+	if corX == "" || corY == "" {
+		http.Error(w, "Missing position argument(s)", http.StatusBadRequest)
 		return
 	}
+
+	if gs.settings.LocalTest {
+		if token == "" {
+			fmt.Println("Missing player token!")
+		}
+
+		if lobbyId == "" {
+			fmt.Println("Missing lobby ID!")
+			for lid := range gs.Lobbies {
+				lobbyId = lid
+				break
+			}
+		}
+	} else {
+		if token == "" {
+			http.Error(w, "Missing Arguments", http.StatusBadRequest)
+			return
+		}
+
+		if lobbyId == "" {
+			http.Error(w, "Missing lobby ID", http.StatusBadRequest)
+			return
+		}
+	}
+
+	lobby, err := gs.GetLobby(lobbyId)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("no lobby with ID %s", lobbyId), http.StatusInternalServerError)
+	}
+
+	x, err := strconv.Atoi(corX)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("invalid X coordinate \"%s\"", corX), http.StatusBadRequest)
+		return
+	}
+	y, err := strconv.Atoi(corY)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("invalid Y coordinate \"%s\"", corY), http.StatusBadRequest)
+		return
+	}
+
+	err = lobby.PlaceMark(x, y, token)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("failed to place mark at %d;%d: %v", x, y, err), http.StatusBadRequest)
+		return
+	}
+
+	if gs.settings.LocalTest {
+		lobby.Grid.PlaceRandomMark(game.MarkO)
+	}
+
+	// TODO status 200
 }

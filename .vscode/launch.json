@@ -12,9 +12,22 @@
             "mode": "auto",
             "program": "server.go",
             "env": {
-                "ADMIN_USER": "admin",
-		        "ADMIN_PASS": "pass",
-		        "ADMIN_TOKEN": "token"
+                "TTTSERVER_ADMIN_USER": "admin",
+		        "TTTSERVER_ADMIN_PASS": "pass",
+		        "TTTSERVER_ADMIN_TOKEN": "token"
+            }
+        },
+        {
+            "name": "Loopback server debug",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "server.go",
+            "env": {
+                "TTTSERVER_ADMIN_USER": "admin",
+		        "TTTSERVER_ADMIN_PASS": "pass",
+		        "TTTSERVER_ADMIN_TOKEN": "token",
+                "TTTSERVER_LOCAL_TEST": "test"
             }
         }
     ]
